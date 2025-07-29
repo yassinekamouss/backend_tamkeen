@@ -1,0 +1,26 @@
+{
+  "name": "backendtamkeen",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ahyahya1616/backend_tamkeen.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/ahyahya1616/backend_tamkeen/issues"
+  },
+  "homepage": "https://github.com/ahyahya1616/backend_tamkeen#readme",
+  "dependencies": {
+    "dotenv": "^17.2.1",
+    "express": "^5.1.0",
+    "mongoose": "^8.16.5"
+  }
+}
