@@ -1,4 +1,10 @@
+const mongoose = require("mongoose");
 const TestSchema = new mongoose.Schema({
+     personne: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Personne",
+    required: true
+  },
     secteurActivite: {
         type: String,
         required: true,
@@ -40,4 +46,5 @@ const TestSchema = new mongoose.Schema({
 
 });
 
-const Test = mongoose.model("Test", TestSchema);
+const TestElegibilite = mongoose.model("TestElegibilite", TestSchema);
+module.exports = TestElegibilite;

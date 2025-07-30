@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
-const { verifierEligibilite } = require("../controllers/testController");
+const { verifierElegibilite } = require("../controllers/testController");
 
-router.post("/eligibilite", verifierEligibilite);
+router.post("/eligibilite", verifierElegibilite);
 
 module.exports = router;

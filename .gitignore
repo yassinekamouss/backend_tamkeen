@@ -16,3 +16,6 @@ build/
 # Cache IDE / système (exemples)
 .vscode/
 .DS_Store
+
+
+test-api.http

@@ -1,24 +1,31 @@
 const Personne = require("../models/Personne");
 const TestElegibilite = require("../models/TestElegibilite");
 
-// Créer ou mettre à jour une personne et enregistrer une soumission
+// Créer une personne si elle n'existe pas, puis enregistrer une soumission de test
 exports.verifierElegibilite = async (req, res) => {
   try {
     const data = req.body;
+    let personne;
 
-    // Vérifier existence de la personne par email
-    let personne = await Personne.findOne({ email: data.email });
-
-    if (personne) {
-      personne.set({
+    // Vérifier l'existence de la personne selon son type
+    if (data.type === "physique") {
+      personne = await Personne.findOne({
         nom: data.nom,
         prenom: data.prenom,
-        denomination: data.denomination,
-        telephone: data.telephone,
-        type: data.type,
+        email: data.email,
+        telephone: data.telephone
       });
-      await personne.save();
+    } else if (data.type === "morale") {
+      personne = await Personne.findOne({
+        denomination: data.denomination,
+        email: data.email
+      });
     } else {
+      return res.status(400).json({ success: false, message: "Type de personne invalide" });
+    }
+
+    // Si la personne n'existe pas, on la crée
+    if (!personne) {
       personne = await Personne.create({
         nom: data.nom,
         prenom: data.prenom,
@@ -29,21 +36,30 @@ exports.verifierElegibilite = async (req, res) => {
       });
     }
 
-    // Créer la soumission
+    // Créer un nouveau test lié à la personne
     const test = await TestElegibilite.create({
       personne: personne._id,
-      secteur: data.secteur,
+      secteurActivite: data.secteurActivite,
+      secteurTravail: data.secteurTravail,
       region: data.region,
       statutJuridique: data.statutJuridique,
+      formeJuridique: data.formeJuridique,
       anneeCreation: data.anneeCreation,
       chiffreAffaire: data.chiffreAffaire,
-      montantInvestissement: data.montantInvestissement,
+      montantPrevisionnelInvestissement: data.montantPrevisionnelInvestissement,
     });
 
-    return res.status(201).json({ success: true, message: "Éligibilité enregistrée", test });
+    return res.status(201).json({
+      success: true,
+      message: "Éligibilité enregistrée avec succès",
+      test
+    });
 
   } catch (error) {
-    console.error(error);
-    return res.status(500).json({ success: false, message: "Erreur serveur" });
+    console.error("Erreur lors de la vérification d’éligibilité :", error);
+    return res.status(500).json({
+      success: false,
+      message: "Erreur serveur. Veuillez réessayer plus tard."
+    });
   }
 };

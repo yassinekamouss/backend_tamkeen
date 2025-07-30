@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const PersonneSchema = new mongoose.Schema({
 
   type: { type: String, enum: ["physique", "morale"], required: true },
@@ -10,3 +11,4 @@ const PersonneSchema = new mongoose.Schema({
 });
 
 const Personne = mongoose.model("Personne", PersonneSchema);
+module.exports = Personne;
