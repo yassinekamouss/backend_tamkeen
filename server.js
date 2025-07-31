@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const testRoutes = require("./routes/testRoutes");
+const adminRoutes = require("./routes/adminRoutes");
 require("dotenv").config();
 const connectDB = require("./config/db"); // Import de la fonction de connexion
 
@@ -11,7 +12,10 @@ app.use(cors());
 app.use(express.json());
 
 // Routes
-app.use("/api/test", testRoutes)
+app.use("/api/test", testRoutes);
+
+app.use("/api/admin", adminRoutes);
+
 
 // Connexion à MongoDB
 connectDB();
