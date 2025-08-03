@@ -1,9 +1,12 @@
+require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
+const connectDB = require("./config/db"); // Import de la fonction de connexion
+
+
 const testRoutes = require("./routes/testRoutes");
 const adminRoutes = require("./routes/adminRoutes");
-require("dotenv").config();
-const connectDB = require("./config/db"); // Import de la fonction de connexion
+const programRoutes = require("./routes/programRoutes");
 
 const app = express();
 
@@ -13,7 +16,7 @@ app.use(express.json());
 
 // Routes
 app.use("/api/test", testRoutes);
-
+app.use("/api/programs", programRoutes);
 app.use("/api/admin", adminRoutes);
 
 

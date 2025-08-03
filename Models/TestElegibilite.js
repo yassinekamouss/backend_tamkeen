@@ -42,6 +42,10 @@ const TestSchema = new mongoose.Schema({
         type: Number,
         required: true,
         min: 0
+    },
+     programmesEligibles: {
+        type: [String], // Tableau de noms de programmes
+        default: []     // Vide par défaut (pas éligible)
     }
 
 });
