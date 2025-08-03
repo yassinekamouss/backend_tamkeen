@@ -13,10 +13,11 @@ const app = express();
 // Middleware
 app.use(cors());
 app.use(express.json());
+const authAdmin = require("./middlewares/authAdmin"); 
 
 // Routes
 app.use("/api/test", testRoutes);
-app.use("/api/programs", programRoutes);
+app.use("/api/programs", authAdmin, programRoutes);
 app.use("/api/admin", adminRoutes);
 
 

@@ -18,4 +18,7 @@ const authAdmin = (req, res, next) => {
   }
 };
 
+console.log("Middleware authAdmin exécuté");
+
+
 module.exports = authAdmin;
