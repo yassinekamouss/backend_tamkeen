@@ -6,7 +6,9 @@ exports.getAllUsers = async (req, res) => {
     const personnes = await Personne.find();
     res.json(personnes);
   } catch (err) {
-    res.status(500).json({ message: "Erreur lors de la récupération", error: err.message });
+    res
+      .status(500)
+      .json({ message: "Erreur lors de la récupération", error: err.message });
   }
 };
 
@@ -19,20 +21,26 @@ exports.getUserById = async (req, res) => {
     }
     res.json(personne);
   } catch (err) {
-    res.status(500).json({ message: "Erreur lors de la récupération", error: err.message });
+    res
+      .status(500)
+      .json({ message: "Erreur lors de la récupération", error: err.message });
   }
 };
 
 // Mettre à jour une personne
 exports.updateUser = async (req, res) => {
   try {
-    const updated = await Personne.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const updated = await Personne.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+    });
     if (!updated) {
       return res.status(404).json({ message: "Personne non trouvée" });
     }
     res.json(updated);
   } catch (err) {
-    res.status(400).json({ message: "Erreur lors de la mise à jour", error: err.message });
+    res
+      .status(400)
+      .json({ message: "Erreur lors de la mise à jour", error: err.message });
   }
 };
 

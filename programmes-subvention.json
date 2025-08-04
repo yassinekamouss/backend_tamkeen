@@ -1,0 +1,60 @@
+[
+  {
+    "name": "Go Siyaha",
+    "description": "Programme de soutien aux activités touristiques - priorité sectorielle pour le développement du tourisme au Maroc",
+    "isActive": true,
+    "criteres": {
+      "secteurActivite": ["ActiviteTouristique"],
+      "statutJuridique": [
+        "sarl",
+        "sarlu",
+        "societe-sas",
+        "aucune-forme",
+        "en-cours-creation",
+        "personne-physique-patente",
+        "societe-sa"
+      ],
+      "applicantType": ["physique", "morale"],
+      "montantInvestissement": [
+        "moins-1M",
+        "1M-50M",
+        "plus-50M",
+        "aucun-minimum"
+      ],
+      "chiffreAffaireMin": null,
+      "chiffreAffaireMax": null,
+      "anneeCreation": [],
+      "region": []
+    }
+  },
+  {
+    "name": "Charte Grandes Entreprises",
+    "description": "Programme destiné aux grandes entreprises avec des projets d'investissement majeurs supérieurs à 50 millions MAD",
+    "isActive": true,
+    "criteres": {
+      "secteurActivite": [],
+      "statutJuridique": ["sarl", "sarlu", "societe-sas", "societe-sa"],
+      "applicantType": ["morale"],
+      "montantInvestissement": ["plus-50M"],
+      "chiffreAffaireMin": 1000000,
+      "chiffreAffaireMax": 200000000,
+      "anneeCreation": [],
+      "region": []
+    }
+  },
+  {
+    "name": "La Charte TPME",
+    "description": "Programme de soutien aux Très Petites, Petites et Moyennes Entreprises avec des investissements entre 1 et 50 millions MAD",
+    "isActive": true,
+    "criteres": {
+      "secteurActivite": [],
+      "statutJuridique": ["sarl", "sarlu", "societe-sas", "societe-sa"],
+      "applicantType": ["morale"],
+      "montantInvestissement": ["1M-50M"],
+      "chiffreAffaireMin": 1000000,
+      "chiffreAffaireMax": 200000000,
+      "anneeCreation": [],
+      "region": []
+    }
+  }
+]
