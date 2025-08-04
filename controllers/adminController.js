@@ -4,6 +4,10 @@ const jwt = require("jsonwebtoken");
 
 // POST /api/admin/login
 exports.loginAdmin = async (req, res) => {
+
+
+
+
   const { email, password } = req.body;
 
   try {
@@ -29,11 +33,12 @@ exports.loginAdmin = async (req, res) => {
 };
 
 // POST /api/admin/register 
-/*
+
 exports.registerAdmin = async (req, res) => {
   const { email, password } = req.body;
 
   try {
+    console.log("Données reçues:", req.body);
     const exists = await Admin.findOne({ email });
     if (exists) {
       return res.status(400).json({ message: "Admin déjà existant." });
@@ -49,4 +54,3 @@ exports.registerAdmin = async (req, res) => {
     res.status(500).json({ message: "Erreur serveur." });
   }
 };
-*/

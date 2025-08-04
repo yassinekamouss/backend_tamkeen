@@ -19,6 +19,7 @@ const authAdmin = require("./middlewares/authAdmin");
 app.use("/api/test", testRoutes);
 app.use("/api/programs", authAdmin, programRoutes);
 app.use("/api/admin", adminRoutes);
+// app.use("/api/", adminRoutes);
 
 
 // Connexion à MongoDB
