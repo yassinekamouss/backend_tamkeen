@@ -6,7 +6,7 @@ const connectDB = require("./config/db"); // Import de la fonction de connexion
 const testRoutes = require("./routes/testRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 const programRoutes = require("./routes/programRoutes");
-
+const userRoutes = require("./routes/userRoutes"); 
 const app = express();
 
 // Middleware
@@ -18,6 +18,7 @@ const authAdmin = require("./middlewares/authAdmin");
 app.use("/api/test", testRoutes);
 app.use("/api/programs", authAdmin, programRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/users", userRoutes );
 
 // Lancement conditionnel du serveur après connexion à MongoDB
 const PORT = process.env.PORT || 5000;
