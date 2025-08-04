@@ -29,7 +29,6 @@ exports.loginAdmin = async (req, res) => {
 };
 
 // POST /api/admin/register 
-/*
 exports.registerAdmin = async (req, res) => {
   const { email, password } = req.body;
 
@@ -49,4 +48,3 @@ exports.registerAdmin = async (req, res) => {
     res.status(500).json({ message: "Erreur serveur." });
   }
 };
-*/
