@@ -1,0 +1,54 @@
+[
+  {
+    "type": "physique",
+    "nom": "Benali",
+    "prenom": "Ahmed",
+    "email": "ahmed.benali@email.com",
+    "telephone": "+212661234567"
+  },
+  {
+    "type": "physique",
+    "nom": "El Mansouri",
+    "prenom": "Fatima",
+    "email": "fatima.elmansouri@email.com",
+    "telephone": "+212662345678"
+  },
+  {
+    "type": "morale",
+    "denomination": "TechnoSoft SARL",
+    "email": "contact@technosoft.ma",
+    "telephone": "+212522876543"
+  },
+  {
+    "type": "morale",
+    "denomination": "Innovation Digital SA",
+    "email": "info@innovation-digital.ma",
+    "telephone": "+212523987654"
+  },
+  {
+    "type": "physique",
+    "nom": "Ouali",
+    "prenom": "Mohamed",
+    "email": "mohamed.ouali@email.com",
+    "telephone": "+212663456789"
+  },
+  {
+    "type": "morale",
+    "denomination": "Green Energy Solutions",
+    "email": "contact@green-energy.ma",
+    "telephone": "+212524123456"
+  },
+  {
+    "type": "physique",
+    "nom": "Amrani",
+    "prenom": "Khadija",
+    "email": "khadija.amrani@email.com",
+    "telephone": "+212664567890"
+  },
+  {
+    "type": "morale",
+    "denomination": "Moroccan Tourism Agency",
+    "email": "contact@morocco-tourism.ma",
+    "telephone": "+212525234567"
+  }
+]
