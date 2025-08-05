@@ -9,10 +9,6 @@ const TestSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    secteurTravail: {
-        type: String,
-        required: false,
-    },
     region: {
         type: String,
         required: true,
@@ -20,10 +16,6 @@ const TestSchema = new mongoose.Schema({
     statutJuridique: {
         type: String,
         required: false,
-    },
-    formeJuridique: {
-        type: String,
-        required: true,
     },
     anneeCreation: {
         type: Number,
