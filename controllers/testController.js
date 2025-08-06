@@ -80,4 +80,28 @@ exports.verifierElegibilite = async (req, res) => {
       message: "Erreur serveur. Veuillez réessayer plus tard."
     });
   }
+
 };
+
+
+
+
+
+// Définitions des fonctions
+const getTestsByPersonneId = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const tests = await TestElegibilite.find({ personne: id }).populate("personne");
+
+    if (!tests || tests.length === 0) {
+      return res.status(404).json({ success: false, message: "Aucun test trouvé pour cette personne." });
+    }
+
+    return res.status(200).json({ success: true, tests });
+  } catch (error) {
+    console.error("Erreur lors de la récupération des tests :", error);
+    return res.status(500).json({ success: false, message: "Erreur serveur." });
+  }
+};
+exports.getTestsByPersonneId = getTestsByPersonneId;

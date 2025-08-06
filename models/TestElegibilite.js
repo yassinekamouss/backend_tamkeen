@@ -5,6 +5,7 @@ const TestSchema = new mongoose.Schema({
     ref: "Personne",
     required: true
   },
+
     secteurTravail: {
         type: String,
         required: true,
