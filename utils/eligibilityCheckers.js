@@ -1,6 +1,6 @@
 const criteresCheckers = {
-  secteurActivite: (valeursCriteres, formData) =>
-    !valeursCriteres.length || valeursCriteres.includes(formData.secteurActivite),
+  secteurTravail: (valeursCriteres, formData) =>
+    !valeursCriteres.length || valeursCriteres.includes(formData.secteurTravail),
 
   statutJuridique: (valeursCriteres, formData) =>
     !valeursCriteres.length || valeursCriteres.includes(formData.statutJuridique),

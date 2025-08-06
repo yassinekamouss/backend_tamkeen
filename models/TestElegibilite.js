@@ -5,13 +5,9 @@ const TestSchema = new mongoose.Schema({
     ref: "Personne",
     required: true
   },
-    secteurActivite: {
-        type: String,
-        required: true,
-    },
     secteurTravail: {
         type: String,
-        required: false,
+        required: true,
     },
     region: {
         type: String,
@@ -19,14 +15,10 @@ const TestSchema = new mongoose.Schema({
     },
     statutJuridique: {
         type: String,
-        required: false,
-    },
-    formeJuridique: {
-        type: String,
         required: true,
     },
     anneeCreation: {
-        type: Number,
+        type: String,
         required: true
     },
     chiffreAffaire: {
@@ -38,8 +30,8 @@ const TestSchema = new mongoose.Schema({
     //     type: Boolean,
     //     default: false
     // },
-    montantPrevisionnelInvestissement: {
-        type: Number,
+    montantInvestissement: {
+        type: String,
         required: true,
         min: 0
     },

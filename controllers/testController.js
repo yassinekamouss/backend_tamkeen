@@ -1,62 +1,80 @@
 const Personne = require("../models/Personne");
 const TestElegibilite = require("../models/TestElegibilite");
+const Program = require("../models/Program");
+const getPrograms = require("../utils/eligibilityHelpers");
 
-// Créer une personne si elle n'existe pas, puis enregistrer une soumission de test
 exports.verifierElegibilite = async (req, res) => {
   try {
     const data = req.body;
+    console.log("Données reçues:", req.body);
     let personne;
 
-    // Vérifier l'existence de la personne selon son type
-    if (data.type === "physique") {
-      personne = await Personne.findOne({
-        nom: data.nom,
-        prenom: data.prenom,
-        email: data.email,
-        telephone: data.telephone
-      });
-    } else if (data.type === "morale") {
-      personne = await Personne.findOne({
-        denomination: data.denomination,
-        email: data.email
-      });
-    } else {
-      return res.status(400).json({ success: false, message: "Type de personne invalide" });
-    }
-
-    // Si la personne n'existe pas, on la crée
+    // Vérifier si la personne existe déjà par email
+    personne = await Personne.findOne({ email: data.email });
+    
     if (!personne) {
-      personne = await Personne.create({
-        nom: data.nom,
-        prenom: data.prenom,
-        denomination: data.denomination,
-        email: data.email,
-        telephone: data.telephone,
-        type: data.type,
-      });
+      // Si pas trouvée par email, vérifier selon le type
+      if (data.applicantType === "physique") {
+        personne = await Personne.findOne({
+          nom: data.nom,
+          prenom: data.prenom,
+          telephone: data.telephone
+        });
+      } else if (data.applicantType === "morale") {
+        personne = await Personne.findOne({
+          nomEntreprise: data.nomEntreprise
+        });
+      } else {
+        return res.status(400).json({ success: false, message: "Type de personne invalide" });
+      }
     }
 
-    // Créer un nouveau test lié à la personne
+    // Créer la personne si elle n'existe pas
+    if (!personne) {
+      try {
+        personne = await Personne.create({
+          nom: data.nom,
+          prenom: data.prenom,
+          nomEntreprise: data.nomEntreprise,
+          email: data.email,
+          telephone: data.telephone,
+          applicantType: data.applicantType,
+        });
+      } catch (error) {
+        // Si erreur de duplication d'email, récupérer la personne existante
+        if (error.code === 11000) {
+          personne = await Personne.findOne({ email: data.email });
+        } else {
+          throw error;
+        }
+      }
+    }
+
+    // Récupérer tous les programmes
+    const allPrograms = await Program.find();
+
+    // Trouver les programmes éligibles
+    const eligibleProgramNames = getPrograms(allPrograms, data);
+
+    // Créer un test d'éligibilité avec les programmes trouvés
     const test = await TestElegibilite.create({
       personne: personne._id,
-      secteurActivite: data.secteurActivite,
-      secteurTravail: data.secteurTravail,
+      secteurTravail: data.secteurTravail, // Corrigé: était secteurActivite
       region: data.region,
       statutJuridique: data.statutJuridique,
-      formeJuridique: data.formeJuridique,
-      anneeCreation: data.anneeCreation,
+      anneeCreation: parseInt(data.anneeCreation) || new Date().getFullYear(), // Corrigé: conversion en nombre
       chiffreAffaire: data.chiffreAffaire,
-      montantPrevisionnelInvestissement: data.montantPrevisionnelInvestissement,
+      montantInvestissement: data.montantInvestissement,
+      programmesEligibles: eligibleProgramNames,
     });
 
     return res.status(201).json({
       success: true,
-      message: "Éligibilité enregistrée avec succès",
-      test
+      programs: eligibleProgramNames,
     });
 
   } catch (error) {
-    console.error("Erreur lors de la vérification d’éligibilité :", error);
+    console.error("Erreur lors de la vérification d'éligibilité :", error);
     return res.status(500).json({
       success: false,
       message: "Erreur serveur. Veuillez réessayer plus tard."
