@@ -51,10 +51,11 @@ exports.verifierElegibilite = async (req, res) => {
     }
 
     // Récupérer tous les programmes
-    const allPrograms = await Program.find();
+ const activePrograms = await Program.find({ isActive: true });
+
 
     // Trouver les programmes éligibles
-    const eligibleProgramNames = getPrograms(allPrograms, data);
+    const eligibleProgramNames = getPrograms(activePrograms, data);
 
     // Créer un test d'éligibilité avec les programmes trouvés
     const test = await TestElegibilite.create({
