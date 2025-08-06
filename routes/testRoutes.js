@@ -6,5 +6,4 @@ const testController = require("../controllers/testController");
 
 router.post("/eligibilite", verifierElegibilite);
 router.get("/eligibilite/personne/:id", testController.getTestsByPersonneId);
-
 module.exports = router;

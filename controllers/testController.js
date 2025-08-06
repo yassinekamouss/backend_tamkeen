@@ -83,12 +83,8 @@ exports.verifierElegibilite = async (req, res) => {
 
 };
 
-
-
-
-
 // Définitions des fonctions
-const getTestsByPersonneId = async (req, res) => {
+exports.getTestsByPersonneId = async (req, res) => {
   const { id } = req.params;
 
   try {
@@ -104,4 +100,3 @@ const getTestsByPersonneId = async (req, res) => {
     return res.status(500).json({ success: false, message: "Erreur serveur." });
   }
 };
-exports.getTestsByPersonneId = getTestsByPersonneId;
