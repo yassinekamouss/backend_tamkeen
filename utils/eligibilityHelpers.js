@@ -10,7 +10,7 @@ function getPrograms(programs, formData) {
     for (const critere in criteres) {
       const valeur = criteres[critere];
 
-      // Vérifie s'il existe une fonction pour ce critère
+     
       const checker = criteresCheckers[critere];
       if (checker) {
         const result = checker(valeur, formData);
