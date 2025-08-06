@@ -59,10 +59,10 @@ exports.verifierElegibilite = async (req, res) => {
     // Créer un test d'éligibilité avec les programmes trouvés
     const test = await TestElegibilite.create({
       personne: personne._id,
-      secteurTravail: data.secteurTravail, // Corrigé: était secteurActivite
+      secteurTravail: data.secteurTravail, 
       region: data.region,
       statutJuridique: data.statutJuridique,
-      anneeCreation: parseInt(data.anneeCreation) || new Date().getFullYear(), // Corrigé: conversion en nombre
+      anneeCreation: data.anneeCreation, // Corrigé: conversion en nombre
       chiffreAffaire: data.chiffreAffaire,
       montantInvestissement: data.montantInvestissement,
       programmesEligibles: eligibleProgramNames,

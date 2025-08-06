@@ -11,7 +11,7 @@ const programSchema = new mongoose.Schema({
     montantInvestissement: [String],
     chiffreAffaireMin: Number,
     chiffreAffaireMax: Number,
-    anneeCreation: [Number],
+    anneeCreation: [String],
     region: [String]
   },
 });

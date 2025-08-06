@@ -1,5 +1,5 @@
 const criteresCheckers = {
-  secteurTravail: (valeursCriteres, formData) =>
+  secteurActivite: (valeursCriteres, formData) =>
     !valeursCriteres.length || valeursCriteres.includes(formData.secteurTravail),
 
   statutJuridique: (valeursCriteres, formData) =>
@@ -12,7 +12,7 @@ const criteresCheckers = {
     !valeursCriteres.length || valeursCriteres.includes(formData.montantInvestissement),
 
 
-  //we will talk about this later
+
   chiffreAffaire: ({ chiffreAffaireMin, chiffreAffaireMax } = {}, formData) => {
     const years = Object.keys(formData).filter((k) => k.startsWith("chiffreAffaire"));
     const values = years.map((y) => parseFloat(formData[y])).filter((v) => !isNaN(v));
