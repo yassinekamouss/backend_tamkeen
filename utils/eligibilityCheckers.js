@@ -13,7 +13,6 @@ const criteresCheckers = {
 
 
 chiffreAffaire: ({ chiffreAffaireMin, chiffreAffaireMax } = {}, formData) => {
-  console.log(chiffreAffaireMin, chiffreAffaireMax, formData);
   const valeurs = [
     parseFloat(formData.chiffreAffaire2022),
     parseFloat(formData.chiffreAffaire2023),
