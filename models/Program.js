@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { chiffreAffaire } = require("../utils/eligibilityCheckers");
 
 const programSchema = new mongoose.Schema({
   name: { type: String, required: true },
@@ -9,8 +10,10 @@ const programSchema = new mongoose.Schema({
     statutJuridique: [String],
     applicantType: [String],
     montantInvestissement: [String],
-    chiffreAffaireMin: Number,
-    chiffreAffaireMax: Number,
+    chiffreAffaire: {
+          chiffreAffaireMin: { type: Number, default: null },
+          chiffreAffaireMax: { type: Number, default: null },
+        },  
     anneeCreation: [String],
     region: [String]
   },

@@ -22,22 +22,24 @@ const TestSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-      chiffreAffaire2022:{
-        type: Number,
-        min: 0,
-        required: false
+    chiffreAffaires: {
+        chiffreAffaire2022: {
+          type: Number,
+          min: 0,
+          required: false
+        },
+       chiffreAffaire2023: {
+          type: Number,
+          min: 0,
+          required: false
+        },
+        chiffreAffaire2024: {
+          type: Number,
+          min: 0,
+          required: false
+        }
       },
-       chiffreAffaire2023:{
-        type: Number,
-        min: 0,
-        required: false
-      },
-       chiffreAffaire2024:{
-        type: Number,
-        min: 0,
-        required: false
-      },
-      
+          
 
     // estRecente: {
     //     type: Boolean,

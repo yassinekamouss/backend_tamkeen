@@ -13,6 +13,11 @@ const criteresCheckers = {
 
 
 chiffreAffaire: ({ chiffreAffaireMin, chiffreAffaireMax } = {}, formData) => {
+  const shouldSkip =
+    (chiffreAffaireMin == null) && (chiffreAffaireMax == null);
+
+  if (shouldSkip) return true;
+
   const valeurs = [
     parseFloat(formData.chiffreAffaire2022),
     parseFloat(formData.chiffreAffaire2023),
@@ -23,9 +28,12 @@ chiffreAffaire: ({ chiffreAffaireMin, chiffreAffaireMax } = {}, formData) => {
 
   const maxCA = Math.max(...valeurs);
 
-  return (!chiffreAffaireMin || maxCA >= chiffreAffaireMin) &&
-         (!chiffreAffaireMax || maxCA <= chiffreAffaireMax);
+  return (
+    (chiffreAffaireMin == null || maxCA >= chiffreAffaireMin) &&
+    (chiffreAffaireMax == null || maxCA <= chiffreAffaireMax)
+  );
 },
+
 
 
 

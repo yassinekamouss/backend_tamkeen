@@ -1,4 +1,4 @@
-const Program = require("../models/Program"); // à adapter selon ton chemin
+const Program = require("../models/Program"); 
 const mongoose = require("mongoose");
 
 // Créer un programme

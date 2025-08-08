@@ -58,27 +58,18 @@ exports.verifierElegibilite = async (req, res) => {
     const eligibleProgramNames = getPrograms(activePrograms, data);
 
 
-   const chiffreAffaire2022 = data.chiffreAffaire2022 ? parseFloat(data.chiffreAffaire2022) : undefined;
-    const chiffreAffaire2023 = data.chiffreAffaire2023 ? parseFloat(data.chiffreAffaire2023) : undefined;
-    const chiffreAffaire2024 = data.chiffreAffaire2024 ? parseFloat(data.chiffreAffaire2024) : undefined;
-
-    // Injecter les valeurs dans formData pour le checker
-    data.chiffreAffaire2022 = chiffreAffaire2022;
-    data.chiffreAffaire2023 = chiffreAffaire2023;
-    data.chiffreAffaire2024 = chiffreAffaire2024;
-
-
-
     // Créer un test d'éligibilité avec les programmes trouvés
     const test = await TestElegibilite.create({
       personne: personne._id,
       secteurTravail: data.secteurTravail, 
       region: data.region,
       statutJuridique: data.statutJuridique,
-      anneeCreation: data.anneeCreation, // Corrigé: conversion en nombre
-     chiffreAffaire2022,
-      chiffreAffaire2023,
-      chiffreAffaire2024,
+      anneeCreation: data.anneeCreation, 
+      chiffreAffaires: {
+        chiffreAffaire2022: parseFloat(data.chiffreAffaire2022) || undefined,
+        chiffreAffaire2023: parseFloat(data.chiffreAffaire2023) || undefined,
+        chiffreAffaire2024: parseFloat(data.chiffreAffaire2024) || undefined,
+      },
       montantInvestissement: data.montantInvestissement,
       programmesEligibles: eligibleProgramNames,
     });
