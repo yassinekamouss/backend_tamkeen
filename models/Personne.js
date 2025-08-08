@@ -7,6 +7,8 @@ const PersonneSchema = new mongoose.Schema({
   nomEntreprise: String, // pour morale
   email: { type: String, required: true, unique: true },
   telephone: String,
+  age: { type: Number, min: 18, max: 100 }, // pour physique
+  Sexe: { type: String, enum: ["Homme", "Femme","Autre"], required: true }, // pour physique
     
 });
 
