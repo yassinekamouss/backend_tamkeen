@@ -6,10 +6,10 @@ const PersonneSchema = new mongoose.Schema({
   prenom: String,    // pour physique
   nomEntreprise: String, // pour morale
   email: { type: String, required: true, unique: true },
-  telephone: String,
+  telephone: { type: String, required: true, unique: true },
   age: { type: Number, min: 18, max: 100 }, // pour physique
-  Sexe: { type: String, enum: ["Homme", "Femme","Autre"], required: true }, // pour physique
-    
+  Sexe: { type: String, enum: ["Homme", "Femme"], required: false }, // pour physique
+
 });
 
 const Personne = mongoose.model("Personne", PersonneSchema);
