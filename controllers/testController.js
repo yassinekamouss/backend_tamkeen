@@ -5,66 +5,72 @@ const getPrograms = require("../utils/eligibilityHelpers");
 
 exports.verifierElegibilite = async (req, res) => {
   try {
+
     const data = req.body;
-    console.log("Données reçues:", req.body);
-    let personne;
 
-    // Vérifier si la personne existe déjà par email
-    personne = await Personne.findOne({ email: data.email });
-    
-    if (!personne) {
-      // Si pas trouvée par email, vérifier selon le type
+    let personne = await Personne.findOne({ email: data.email });
+
+    if (personne) {
       if (data.applicantType === "physique") {
-        personne = await Personne.findOne({
-          nom: data.nom,
-          prenom: data.prenom,
-          telephone: data.telephone
-        });
-      } else if (data.applicantType === "morale") {
-        personne = await Personne.findOne({
-          nomEntreprise: data.nomEntreprise
-        });
-      } else {
-        return res.status(400).json({ success: false, message: "Type de personne invalide" });
-      }
-    }
+      const infosIdentiques =
+    personne.nom === data.nom &&
+    personne.prenom === data.prenom &&
+    Number(personne.age) === Number(data.age) &&
+    personne.sexe === data.sexe &&
+    personne.telephone === data.telephone;
 
-    // Créer la personne si elle n'existe pas
-    if (!personne) {
-      try {
-        personne = await Personne.create({
-          nom: data.nom,
-          prenom: data.prenom,
-          nomEntreprise: data.nomEntreprise,
-          email: data.email,
-          telephone: data.telephone,
-          applicantType: data.applicantType,
-        });
-      } catch (error) {
-        // Si erreur de duplication d'email, récupérer la personne existante
-        if (error.code === 11000) {
-          personne = await Personne.findOne({ email: data.email });
-        } else {
-          throw error;
+
+        if (!infosIdentiques) {
+          return res.status(400).json({
+            success: false,
+            message: "Cet email est déjà utilisé par une autre personne physique avec des informations différentes."
+          });
         }
+      } else if (data.applicantType === "morale") {
+        const infosIdentiques =
+          personne.nomEntreprise === data.nomEntreprise &&
+          personne.email === data.email;
+
+        if (!infosIdentiques) {
+          return res.status(400).json({
+            success: false,
+            message: "Cet email est déjà utilisé par une autre entreprise avec des informations différentes."
+          });
+        }
+      } else {
+        return res.status(400).json({
+          success: false,
+          message: "Type de demandeur inconnu ou non valide."
+        });
       }
+    
+    } else {
+      // Si l'email n'existe pas, on crée la personne
+      personne = await Personne.create({
+        applicantType: data.applicantType,
+        nom: data.nom,
+        prenom: data.prenom,
+        age: data.age,
+        sexe: data.sexe,
+        nomEntreprise: data.nomEntreprise,
+        email: data.email,
+        telephone: data.telephone
+      });
     }
 
-    // Récupérer tous les programmes
- const activePrograms = await Program.find({ isActive: true });
-
+    // Récupérer tous les programmes actifs
+    const activePrograms = await Program.find({ isActive: true });
 
     // Trouver les programmes éligibles
     const eligibleProgramNames = getPrograms(activePrograms, data);
 
-
-    // Créer un test d'éligibilité avec les programmes trouvés
-    const test = await TestElegibilite.create({
+    // Créer un nouveau test pour cette personne
+    await TestElegibilite.create({
       personne: personne._id,
-      secteurTravail: data.secteurTravail, 
+      secteurTravail: data.secteurTravail,
       region: data.region,
       statutJuridique: data.statutJuridique,
-      anneeCreation: data.anneeCreation, 
+      anneeCreation: data.anneeCreation,
       chiffreAffaires: {
         chiffreAffaire2022: parseFloat(data.chiffreAffaire2022) || undefined,
         chiffreAffaire2023: parseFloat(data.chiffreAffaire2023) || undefined,
@@ -76,7 +82,7 @@ exports.verifierElegibilite = async (req, res) => {
 
     return res.status(201).json({
       success: true,
-      programs: eligibleProgramNames,
+      programs: eligibleProgramNames
     });
 
   } catch (error) {
@@ -86,8 +92,8 @@ exports.verifierElegibilite = async (req, res) => {
       message: "Erreur serveur. Veuillez réessayer plus tard."
     });
   }
-
 };
+
 
 // Définitions des fonctions
 exports.getTestsByPersonneId = async (req, res) => {
