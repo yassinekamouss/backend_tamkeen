@@ -29,7 +29,8 @@ exports.verifierElegibilite = async (req, res) => {
       } else if (data.applicantType === "morale") {
         const infosIdentiques =
           personne.nomEntreprise === data.nomEntreprise &&
-          personne.email === data.email;
+          personne.email === data.email && 
+          personne.telephone === data.telephone;
 
         if (!infosIdentiques) {
           return res.status(400).json({
@@ -62,7 +63,7 @@ exports.verifierElegibilite = async (req, res) => {
     const activePrograms = await Program.find({ isActive: true });
 
     // Trouver les programmes éligibles
-    const eligibleProgramNames = getPrograms(activePrograms, data);
+    const eligibleProgramNamesAndLinks = getPrograms(activePrograms, data);
 
     // Créer un nouveau test pour cette personne
     await TestElegibilite.create({
@@ -77,12 +78,12 @@ exports.verifierElegibilite = async (req, res) => {
         chiffreAffaire2024: parseFloat(data.chiffreAffaire2024) || undefined,
       },
       montantInvestissement: data.montantInvestissement,
-      programmesEligibles: eligibleProgramNames,
+      programmesEligibles: eligibleProgramNamesAndLinks.map(p => p.name),
     });
 
     return res.status(201).json({
       success: true,
-      programs: eligibleProgramNames
+      programs: eligibleProgramNamesAndLinks
     });
 
   } catch (error) {

@@ -7,6 +7,7 @@ const programSchema = new mongoose.Schema({
   isActive: { type: Boolean, default: true },
   DateDebut: { type: Date, default: Date.now },
   DateFin: { type: Date, default: null },
+  link : { type: String, default: "#" },
   // image: { type: String, default: "" },
   criteres: {
     secteurActivite: [String],
