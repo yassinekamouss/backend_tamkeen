@@ -4,7 +4,6 @@ const PersonneSchema = new mongoose.Schema({
   applicantType: { type: String, enum: ["physique", "morale"], required: true },
   nom: String,       // pour physique
   prenom: String,    // pour physique
-  age: Number,         // pour physique
   sexe: String,         // pour physique
   nomEntreprise: String, // pour morale
   email: { type: String, required: true, unique: true },
