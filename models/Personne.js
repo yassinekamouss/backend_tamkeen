@@ -10,7 +10,6 @@ const PersonneSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   telephone: { type: String, required: true, unique: true },
   age: { type: Number, min: 18, max: 100 }, // pour physique
-  Sexe: { type: String, enum: ["Homme", "Femme"], required: false }, // pour physique
 
 });
 
