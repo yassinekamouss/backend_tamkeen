@@ -5,6 +5,7 @@ const mongoose = require("mongoose");
 exports.createProgram = async (req, res) => {
   try {
     const newProgram = new Program(req.body);
+    console.log("Nouveau programme créé :", newProgram);
     const savedProgram = await newProgram.save();
     return res.status(201).json(savedProgram);
   } catch (error) {
@@ -55,7 +56,7 @@ exports.updateProgram = async (req, res) => {
       new: true,
       runValidators: true,
     });
-
+    console.log(" programme ", req.body);
     if (!updatedProgram) {
       return res.status(404).json({ message: "Programme non trouvé" });
     }

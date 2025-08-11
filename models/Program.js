@@ -14,6 +14,11 @@ const programSchema = new mongoose.Schema({
     statutJuridique: [String],
     applicantType: [String],
     montantInvestissement: [String],
+    age: {
+      minAge: { type: Number, default: null },
+      maxAge: { type: Number, default: null },
+    },
+    sexe: [String],
     chiffreAffaire: {
           chiffreAffaireMin: { type: Number, default: null },
           chiffreAffaireMax: { type: Number, default: null },

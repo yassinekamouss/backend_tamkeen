@@ -24,6 +24,7 @@ chiffreAffaire: ({ chiffreAffaireMin, chiffreAffaireMax } = {}, formData) => {
     parseFloat(formData.chiffreAffaire2024)
   ].filter(v => !isNaN(v));
 
+
   if (!valeurs.length) return false;
 
   const maxCA = Math.max(...valeurs);
@@ -34,6 +35,27 @@ chiffreAffaire: ({ chiffreAffaireMin, chiffreAffaireMax } = {}, formData) => {
   );
 },
 
+age: ({ minAge, maxAge } = {}, formData) => {
+  
+    const shouldSkip = ((minAge == null) && (maxAge == null)) || formData.applicantType === "morale";
+    if (shouldSkip) return true;
+
+    const ageCandidat = parseInt(formData.age, 10);
+    if (isNaN(ageCandidat)) return false;
+
+    return (
+      (minAge == null || ageCandidat >= minAge) &&
+      (maxAge == null || ageCandidat <= maxAge)
+    );
+  },
+
+  
+  sexe: (valeursCriteres, formData) =>{
+
+    if (formData.applicantType === "morale") return true;
+   return !valeursCriteres.length || valeursCriteres.includes(formData.sexe);
+  },
+
 
 
 
@@ -42,7 +64,8 @@ chiffreAffaire: ({ chiffreAffaireMin, chiffreAffaireMax } = {}, formData) => {
 
   anneeCreation: (valeursCriteres, formData) => 
    !valeursCriteres.length || valeursCriteres.includes(formData.anneeCreation),
-  
+
+    
 };
 
 module.exports = criteresCheckers;
