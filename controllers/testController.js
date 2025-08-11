@@ -2,114 +2,172 @@ const Personne = require("../models/Personne");
 const TestElegibilite = require("../models/TestElegibilite");
 const Program = require("../models/Program");
 const getPrograms = require("../utils/eligibilityHelpers");
+const asyncHandler = require("../utils/asyncHandler");
+const api = require("../utils/apiResponse");
 
-exports.verifierElegibilite = async (req, res) => {
-  try {
+exports.verifierElegibilite = asyncHandler(async (req, res) => {
+  const data = req.body;
 
-    const data = req.body;
+  let personne = await Personne.findOne({ email: data.email });
 
-    let personne = await Personne.findOne({ email: data.email });
-
-    if (personne) {
-      if (data.applicantType === "physique") {
+  if (personne) {
+    if (data.applicantType === "physique") {
       const infosIdentiques =
-    personne.nom === data.nom &&
-    personne.prenom === data.prenom &&
-    Number(personne.age) === Number(data.age) &&
-    personne.sexe === data.sexe &&
-    personne.telephone === data.telephone;
+        personne.nom === data.nom &&
+        personne.prenom === data.prenom &&
+        Number(personne.age) === Number(data.age) &&
+        personne.sexe === data.sexe &&
+        personne.telephone === data.telephone;
 
-
-        if (!infosIdentiques) {
-          return res.status(400).json({
-            success: false,
-            message: "Cet email est déjà utilisé par une autre personne physique avec des informations différentes."
-          });
-        }
-      } else if (data.applicantType === "morale") {
-        const infosIdentiques =
-          personne.nomEntreprise === data.nomEntreprise &&
-          personne.email === data.email && 
-          personne.telephone === data.telephone;
-
-        if (!infosIdentiques) {
-          return res.status(400).json({
-            success: false,
-            message: "Cet email est déjà utilisé par une autre entreprise avec des informations différentes."
-          });
-        }
-      } else {
-        return res.status(400).json({
-          success: false,
-          message: "Type de demandeur inconnu ou non valide."
-        });
+      if (!infosIdentiques) {
+        return api.error(
+          res,
+          "Cet email est déjà utilisé par une autre personne physique avec des informations différentes.",
+          400
+        );
       }
-    
+    } else if (data.applicantType === "morale") {
+      const infosIdentiques =
+        personne.nomEntreprise === data.nomEntreprise &&
+        personne.email === data.email &&
+        personne.telephone === data.telephone;
+
+      if (!infosIdentiques) {
+        return api.error(
+          res,
+          "Cet email est déjà utilisé par une autre entreprise avec des informations différentes.",
+          400
+        );
+      }
     } else {
-      // Si l'email n'existe pas, on crée la personne
-      personne = await Personne.create({
-        applicantType: data.applicantType,
-        nom: data.nom,
-        prenom: data.prenom,
-        age: data.age,
-        sexe: data.sexe,
-        nomEntreprise: data.nomEntreprise,
-        email: data.email,
-        telephone: data.telephone
-      });
+      return api.error(res, "Type de demandeur inconnu ou non valide.", 400);
     }
-
-    // Récupérer tous les programmes actifs
-    const activePrograms = await Program.find({ isActive: true });
-
-    // Trouver les programmes éligibles
-    const eligibleProgramNamesAndLinks = getPrograms(activePrograms, data);
-
-    // Créer un nouveau test pour cette personne
-    await TestElegibilite.create({
-      personne: personne._id,
-      secteurTravail: data.secteurTravail,
-      region: data.region,
-      statutJuridique: data.statutJuridique,
-      anneeCreation: data.anneeCreation,
-      chiffreAffaires: {
-        chiffreAffaire2022: parseFloat(data.chiffreAffaire2022) || undefined,
-        chiffreAffaire2023: parseFloat(data.chiffreAffaire2023) || undefined,
-        chiffreAffaire2024: parseFloat(data.chiffreAffaire2024) || undefined,
-      },
-      montantInvestissement: data.montantInvestissement,
-      programmesEligibles: eligibleProgramNamesAndLinks.map(p => p.name),
-    });
-
-    return res.status(201).json({
-      success: true,
-      programs: eligibleProgramNamesAndLinks
-    });
-
-  } catch (error) {
-    console.error("Erreur lors de la vérification d'éligibilité :", error);
-    return res.status(500).json({
-      success: false,
-      message: "Erreur serveur. Veuillez réessayer plus tard."
+  } else {
+    // Créer la personne si elle n'existe pas
+    personne = await Personne.create({
+      applicantType: data.applicantType,
+      nom: data.nom,
+      prenom: data.prenom,
+      age: data.age,
+      sexe: data.sexe,
+      nomEntreprise: data.nomEntreprise,
+      email: data.email,
+      telephone: data.telephone,
     });
   }
-};
 
+  // Récupérer tous les programmes actifs
+  const activePrograms = await Program.find({ isActive: true });
+
+  // Trouver les programmes éligibles
+  const eligibleProgramNamesAndLinks = getPrograms(activePrograms, data);
+
+  // Créer un nouveau test pour cette personne
+  await TestElegibilite.create({
+    personne: personne._id,
+    secteurTravail: data.secteurTravail,
+    region: data.region,
+    statutJuridique: data.statutJuridique,
+    anneeCreation: data.anneeCreation,
+    chiffreAffaires: {
+      chiffreAffaire2022: parseFloat(data.chiffreAffaire2022) || undefined,
+      chiffreAffaire2023: parseFloat(data.chiffreAffaire2023) || undefined,
+      chiffreAffaire2024: parseFloat(data.chiffreAffaire2024) || undefined,
+    },
+    montantInvestissement: data.montantInvestissement,
+    programmesEligibles: eligibleProgramNamesAndLinks.map((p) => p.name),
+  });
+
+  return api.created(res, { programs: eligibleProgramNamesAndLinks });
+});
 
 // Définitions des fonctions
-exports.getTestsByPersonneId = async (req, res) => {
+exports.getTestsByPersonneId = asyncHandler(async (req, res) => {
   const { id } = req.params;
+  const tests = await TestElegibilite.find({ personne: id })
+    .populate("personne")
+    .sort({ createdAt: -1 });
 
-  try {
-    const tests = await TestElegibilite.find({ personne: id }).populate("personne");
-
-    if (!tests || tests.length === 0) {
-      return res.status(404).json({ success: false, message: "Aucun test trouvé pour cette personne." });
-    }
-
-    return res.status(200).json({ success: true, tests });
-  } catch (error) {
-    console.error("Erreur lors de la récupération des tests :", error);
-    return res.status(500).json({ success: false, message: "Erreur serveur." });
+  if (!tests || tests.length === 0) {
+    return api.error(res, "Aucun test trouvé pour cette personne.", 404);
   }
-};
+
+  return api.ok(res, { tests });
+});
+
+// Liste paginée de tous les tests avec filtres simples
+// Query params: q, applicantType, eligible (true|false), region, page, limit
+exports.getAllTests = asyncHandler(async (req, res) => {
+  const {
+    q,
+    applicantType,
+    eligible,
+    region,
+    page = 1,
+    limit = 20,
+  } = req.query;
+
+  const pageNum = Math.max(parseInt(page, 10) || 1, 1);
+  const limitNum = Math.min(Math.max(parseInt(limit, 10) || 20, 1), 100);
+  const skip = (pageNum - 1) * limitNum;
+
+  const match = {};
+  if (region) match.region = region;
+
+  let eligibilityExpr = null;
+  if (eligible === "true") {
+    eligibilityExpr = { $gt: [{ $size: "$programmesEligibles" }, 0] };
+  } else if (eligible === "false") {
+    eligibilityExpr = { $eq: [{ $size: "$programmesEligibles" }, 0] };
+  }
+
+  const textOr = [];
+  if (q && typeof q === "string" && q.trim().length > 0) {
+    const regex = new RegExp(q.trim(), "i");
+    textOr.push(
+      { "personne.nom": regex },
+      { "personne.prenom": regex },
+      { "personne.email": regex }
+    );
+  }
+
+  const pipeline = [
+    { $match: match },
+    {
+      $lookup: {
+        from: "personnes",
+        localField: "personne",
+        foreignField: "_id",
+        as: "personne",
+      },
+    },
+    { $unwind: "$personne" },
+  ];
+
+  const matchSecond = {};
+  if (applicantType) matchSecond["personne.applicantType"] = applicantType;
+  if (textOr.length > 0) matchSecond.$or = textOr;
+  if (eligibilityExpr) matchSecond.$expr = eligibilityExpr;
+  if (Object.keys(matchSecond).length > 0)
+    pipeline.push({ $match: matchSecond });
+
+  pipeline.push({ $sort: { createdAt: -1 } });
+  pipeline.push({
+    $facet: {
+      data: [{ $skip: skip }, { $limit: limitNum }],
+      total: [{ $count: "count" }],
+    },
+  });
+
+  const agg = await TestElegibilite.aggregate(pipeline);
+  const data = agg?.[0]?.data || [];
+  const total = agg?.[0]?.total?.[0]?.count || 0;
+
+  return api.ok(res, {
+    tests: data,
+    page: pageNum,
+    limit: limitNum,
+    total,
+    hasMore: skip + data.length < total,
+  });
+});
