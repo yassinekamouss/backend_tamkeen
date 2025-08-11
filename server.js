@@ -9,6 +9,7 @@ const programRoutes = require("./routes/programRoutes");
 const userRoutes = require("./routes/userRoutes");
 const chatRoutes = require("./routes/chatRoutes");
 const statsRoutes = require("./routes/statsRoutes");
+const newsRoutes = require("./routes/newsRoutes");
 const app = express();
 const errorHandler = require("./middlewares/errorHandler");
 
@@ -27,6 +28,7 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/chat", chatRoutes);
 app.use("/api/stats", statsRoutes);
+app.use("/api/news", newsRoutes);
 
 // Middleware d'erreurs (toujours après les routes)
 app.use(errorHandler);
