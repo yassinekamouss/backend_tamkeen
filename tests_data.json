@@ -1,0 +1,41 @@
+[{
+  "_id": {
+    "$oid": "689932eb09d1e9b32341be70"
+  },
+  "personne": {
+    "$oid": "689932eb09d1e9b32341be6d"
+  },
+  "secteurTravail": "ActiviteTouristique",
+  "region": "Fès-Meknès",
+  "statutJuridique": "personne-physique-patente",
+  "anneeCreation": "2024",
+  "chiffreAffaires": {
+    "chiffreAffaire2024": 10000000
+  },
+  "montantInvestissement": "1M-50M",
+  "programmesEligibles": [
+    "Go Siyaha"
+  ],
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6899331409d1e9b32341be76"
+  },
+  "personne": {
+    "$oid": "6899331409d1e9b32341be73"
+  },
+  "secteurTravail": "ActiviteTouristique",
+  "region": "Oriental",
+  "statutJuridique": "sarl",
+  "anneeCreation": "2024",
+  "chiffreAffaires": {
+    "chiffreAffaire2024": 100000000
+  },
+  "montantInvestissement": "1M-50M",
+  "programmesEligibles": [
+    "La Charte TPME",
+    "Go Siyaha"
+  ],
+  "__v": 0
+}]

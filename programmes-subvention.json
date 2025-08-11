@@ -1,58 +1,68 @@
 [
   {
-    "name": "Go Siyaha",
-    "description": "Programme de soutien aux activités touristiques - priorité sectorielle pour le développement du tourisme au Maroc",
+    "name": "La Charte TPME",
+    "description": "Programme de soutien aux Très Petites, Petites et Moyennes Entreprises avec des investissements entre 1 et 50 millions MAD",
     "isActive": true,
+    "link": "www.facebook.com",
+    "DateDebut": "2025-08-11T00:00:00.000Z",
+    "DateFin": "2026-08-11T00:00:00.000Z",
+    "criteres": {
+      "statutJuridique": ["sarl", "sarlu", "societe-sas"],
+      "applicantType": ["morale"],
+      "montantInvestissement": ["1M-50M"],
+      "chiffreAffaire": {
+        "chiffreAffaireMin": 1000000,
+        "chiffreAffaireMax": 200000000
+      },
+      "anneeCreation": [],
+      "region": [],
+      "secteurActivite": []
+    }
+  },
+  {
+    "name": "Go Siyaha",
+    "description": "Programme de soutien aux activités touristiques - priorité sectorielle pour le développement du tourisme au Maroc.",
+    "isActive": true,
+    "link": "www.facebook.com",
+    "DateDebut": "2025-08-11T00:00:00.000Z",
+    "DateFin": "2026-08-11T00:00:00.000Z",
     "criteres": {
       "secteurActivite": ["ActiviteTouristique"],
       "statutJuridique": [
         "sarl",
         "sarlu",
         "societe-sas",
-        "aucune-forme",
         "en-cours-creation",
+        "aucune-forme-juridique",
         "personne-physique-patente",
-        "societe-sa"
+        "aucune-forme"
       ],
       "applicantType": ["physique", "morale"],
-      "montantInvestissement": [
-        "moins-1M",
-        "1M-50M",
-        "plus-50M",
-        "aucun-minimum"
-      ],
-      "chiffreAffaireMin": null,
-      "chiffreAffaireMax": null,
+      "montantInvestissement": [],
+      "chiffreAffaire": {
+        "chiffreAffaireMin": null,
+        "chiffreAffaireMax": null
+      },
       "anneeCreation": [],
       "region": []
     }
   },
   {
     "name": "Charte Grandes Entreprises",
-    "description": "Programme destiné aux grandes entreprises avec des projets d'investissement majeurs supérieurs à 50 millions MAD",
+    "description": "Programme destiné aux grandes entreprises avec des projets d'investissement majeurs supérieurs à 50 millions MAD.",
     "isActive": true,
+    "link": "www.facebook.com",
+    "DateDebut": "2025-08-11T00:00:00.000Z",
+    "DateFin": "2026-08-11T00:00:00.000Z",
     "criteres": {
       "secteurActivite": [],
-      "statutJuridique": ["sarl", "sarlu", "societe-sas", "societe-sa"],
+      "statutJuridique": ["sarl", "sarlu", "societe-sas"],
       "applicantType": ["morale"],
       "montantInvestissement": ["plus-50M"],
-      "chiffreAffaireMin": 1000000,
-      "chiffreAffaireMax": 200000000,
-      "anneeCreation": [],
-      "region": []
-    }
-  },
-  {
-    "name": "La Charte TPME",
-    "description": "Programme de soutien aux Très Petites, Petites et Moyennes Entreprises avec des investissements entre 1 et 50 millions MAD",
-    "isActive": true,
-    "criteres": {
-      "secteurActivite": [],
-      "statutJuridique": ["sarl", "sarlu", "societe-sas", "societe-sa"],
-      "applicantType": ["morale"],
-      "montantInvestissement": ["1M-50M"],
-      "chiffreAffaireMin": 1000000,
-      "chiffreAffaireMax": 200000000,
+      "chiffreAffaire": {
+        "chiffreAffaireMin": 1000000,
+        "chiffreAffaireMax": 200000000
+      },
       "anneeCreation": [],
       "region": []
     }

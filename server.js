@@ -7,6 +7,7 @@ const testRoutes = require("./routes/testRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 const programRoutes = require("./routes/programRoutes");
 const userRoutes = require("./routes/userRoutes");
+const chatRoutes = require("./routes/chatRoutes");
 const app = express();
 
 // Middleware
@@ -19,6 +20,7 @@ app.use("/api/test", testRoutes);
 app.use("/api/programs", programRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/chat", chatRoutes);
 
 // Lancement conditionnel du serveur après connexion à MongoDB
 const PORT = process.env.PORT || 5000;
