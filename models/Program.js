@@ -18,6 +18,11 @@ const programSchema = new mongoose.Schema(
         chiffreAffaireMin: { type: Number, default: null },
         chiffreAffaireMax: { type: Number, default: null },
       },
+      age: {
+      minAge: { type: Number, default: null },
+      maxAge: { type: Number, default: null },
+    },
+    sexe: [String],
       anneeCreation: [String],
       region: [String],
     },
