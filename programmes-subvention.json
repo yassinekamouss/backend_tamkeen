@@ -1,89 +1,91 @@
-[{
-  "_id": {
-    "$oid": "6892a81c2e0d174d4fe599a8"
+[
+  {
+    "name": "La Charte TPME",
+    "description": "Programme de soutien aux Très Petites, Petites et Moyennes Entreprises avec des investissements entre 1 et 50 millions MAD",
+    "isActive": true,
+    "link": "www.facebook.com",
+    "DateDebut": "2025-08-11T00:00:00.000Z",
+    "DateFin": "2026-08-11T00:00:00.000Z",
+    "criteres": {
+      "statutJuridique": [
+        "sarl",
+        "sarlu",
+        "societe-sas"
+      ],
+      "applicantType": [
+        "morale"
+      ],
+      "montantInvestissement": [
+        "1M-50M"
+      ],
+      "chiffreAffaire": {
+        "chiffreAffaireMin": 1000000,
+        "chiffreAffaireMax": 200000000
+      },
+      "anneeCreation": [],
+      "region": [],
+      "secteurActivite": []
+    }
   },
-  "name": "La Charte TPME",
-  "description": "Programme de soutien aux Très Petites, Petites et Moyennes Entreprises avec des investissements entre 1 et 50 millions MAD",
-  "isActive": true,
-  "link":"www.facebook.com",
-  "criteres": {
-    "statutJuridique": [
-      "sarl",
-      "sarlu",
-      "societe-sas"
-    ],
-    "applicantType": [
-      "morale"
-    ],
-    "montantInvestissement": [
-      "1M-50M"
-    ],
-    "chiffreAffaireMin": 1000000,
-    "chiffreAffaireMax": 200000000,
-    "anneeCreation": [],
-    "region": [],
-    "secteurActivite": []
+  {
+    "name": "Go Siyaha",
+    "description": "Programme de soutien aux activités touristiques - priorité sectorielle pour le développement du tourisme au Maroc.",
+    "isActive": true,
+    "link": "www.facebook.com",
+    "DateDebut": "2025-08-11T00:00:00.000Z",
+    "DateFin": "2026-08-11T00:00:00.000Z",
+    "criteres": {
+      "secteurActivite": [
+        "ActiviteTouristique"
+      ],
+      "statutJuridique": [
+        "sarl",
+        "sarlu",
+        "societe-sas",
+        "en-cours-creation",
+        "aucune-forme-juridique",
+        "personne-physique-patente",
+        "aucune-forme"
+      ],
+      "applicantType": [
+        "physique",
+        "morale"
+      ],
+      "montantInvestissement": [],
+      "chiffreAffaire": {
+        "chiffreAffaireMin": null,
+        "chiffreAffaireMax": null
+      },
+      "anneeCreation": [],
+      "region": []
+    }
   },
-  "__v": 2
-},
-{
-  "_id": {
-    "$oid": "6892c3b338c7fc7dbacdacc0"
-  },
-  "name": "Go Siyaha",
-  "description": "Programme de soutien aux activités touristiques - priorité sectorielle pour le développement du tourisme au Maroc.",
-  "isActive": true,
-  "link":"www.facebook.com",
-  "criteres": {
-    "secteurActivite": [
-      "ActiviteTouristique"
-    ],
-    "statutJuridique": [
-      "sarl",
-      "sarlu",
-      "societe-sas",
-      "en-cours-creation",
-      "aucune-forme-juridique",
-      "personne-physique-patente",
-      "aucune-forme"
-    ],
-    "applicantType": [
-      "physique",
-      "morale"
-    ],
-    "montantInvestissement": [],
-    "chiffreAffaireMin": null,
-    "chiffreAffaireMax": null,
-    "anneeCreation": [],
-    "region": []
-  },
-  "__v": 0
-},
-{
-  "_id": {
-    "$oid": "6892f57d7682fe2d0210bc27"
-  },
-  "name": "Charte Grandes Entreprises",
-  "description": "Programme destiné aux grandes entreprises avec des projets d'investissement majeurs supérieurs à 50 millions MAD.",
-  "isActive": true,
-  "link":"www.facebook.com",
-  "criteres": {
-    "secteurActivite": [],
-    "statutJuridique": [
-      "sarl",
-      "sarlu",
-      "societe-sas"
-    ],
-    "applicantType": [
-      "morale"
-    ],
-    "montantInvestissement": [
-      "plus-50M"
-    ],
-    "chiffreAffaireMin": 1000000,
-    "chiffreAffaireMax": 200000000,
-    "anneeCreation": [],
-    "region": []
-  },
-  "__v": 0
-}]
+  {
+    "name": "Charte Grandes Entreprises",
+    "description": "Programme destiné aux grandes entreprises avec des projets d'investissement majeurs supérieurs à 50 millions MAD.",
+    "isActive": true,
+    "link": "www.facebook.com",
+    "DateDebut": "2025-08-11T00:00:00.000Z",
+    "DateFin": "2026-08-11T00:00:00.000Z",
+    "criteres": {
+      "secteurActivite": [],
+      "statutJuridique": [
+        "sarl",
+        "sarlu",
+        "societe-sas"
+      ],
+      "applicantType": [
+        "morale"
+      ],
+      "montantInvestissement": [
+        "plus-50M"
+      ],
+      "chiffreAffaire": {
+        "chiffreAffaireMin": 1000000,
+        "chiffreAffaireMax": 200000000
+      },
+      "anneeCreation": [],
+      "region": []
+    }
+  }
+]
