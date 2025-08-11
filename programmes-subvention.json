@@ -7,17 +7,9 @@
     "DateDebut": "2025-08-11T00:00:00.000Z",
     "DateFin": "2026-08-11T00:00:00.000Z",
     "criteres": {
-      "statutJuridique": [
-        "sarl",
-        "sarlu",
-        "societe-sas"
-      ],
-      "applicantType": [
-        "morale"
-      ],
-      "montantInvestissement": [
-        "1M-50M"
-      ],
+      "statutJuridique": ["sarl", "sarlu", "societe-sas"],
+      "applicantType": ["morale"],
+      "montantInvestissement": ["1M-50M"],
       "chiffreAffaire": {
         "chiffreAffaireMin": 1000000,
         "chiffreAffaireMax": 200000000
@@ -35,9 +27,7 @@
     "DateDebut": "2025-08-11T00:00:00.000Z",
     "DateFin": "2026-08-11T00:00:00.000Z",
     "criteres": {
-      "secteurActivite": [
-        "ActiviteTouristique"
-      ],
+      "secteurActivite": ["ActiviteTouristique"],
       "statutJuridique": [
         "sarl",
         "sarlu",
@@ -47,10 +37,7 @@
         "personne-physique-patente",
         "aucune-forme"
       ],
-      "applicantType": [
-        "physique",
-        "morale"
-      ],
+      "applicantType": ["physique", "morale"],
       "montantInvestissement": [],
       "chiffreAffaire": {
         "chiffreAffaireMin": null,
@@ -69,17 +56,9 @@
     "DateFin": "2026-08-11T00:00:00.000Z",
     "criteres": {
       "secteurActivite": [],
-      "statutJuridique": [
-        "sarl",
-        "sarlu",
-        "societe-sas"
-      ],
-      "applicantType": [
-        "morale"
-      ],
-      "montantInvestissement": [
-        "plus-50M"
-      ],
+      "statutJuridique": ["sarl", "sarlu", "societe-sas"],
+      "applicantType": ["morale"],
+      "montantInvestissement": ["plus-50M"],
       "chiffreAffaire": {
         "chiffreAffaireMin": 1000000,
         "chiffreAffaireMax": 200000000
