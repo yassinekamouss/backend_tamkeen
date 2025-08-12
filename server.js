@@ -47,7 +47,7 @@ Sentry.setupExpressErrorHandler(app);
 
 
 const PORT = process.env.PORT || 5000;
-
+async function startServer() {
   try {
     await connectDB(); // attendre la connexion DB
     app.listen(PORT, () => {
@@ -57,5 +57,5 @@ const PORT = process.env.PORT || 5000;
     console.error("Failed to connect to DB, server not started", error);
     process.exit(1); // optionnel : quitter le processus en cas d’erreur critique
   }
-
+};
 startServer();
