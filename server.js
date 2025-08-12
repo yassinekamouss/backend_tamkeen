@@ -45,10 +45,9 @@ app.get("/debug-sentry", (req, res) => {
 // Middleware de capture des erreurs (nouvelle API)
 Sentry.setupExpressErrorHandler(app);
 
-// Démarrage serveur
+
 const PORT = process.env.PORT || 5000;
 
-const startServer = async () => {
   try {
     await connectDB(); // attendre la connexion DB
     app.listen(PORT, () => {
@@ -58,6 +57,5 @@ const startServer = async () => {
     console.error("Failed to connect to DB, server not started", error);
     process.exit(1); // optionnel : quitter le processus en cas d’erreur critique
   }
-};
 
 startServer();

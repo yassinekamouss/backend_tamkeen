@@ -4,6 +4,7 @@ const Program = require("../models/Program");
 const getPrograms = require("../utils/eligibilityHelpers");
 const asyncHandler = require("../utils/asyncHandler");
 const api = require("../utils/apiResponse");
+const sendEmail = require("../utils/email");
 
 exports.verifierElegibilite = asyncHandler(async (req, res) => {
   const data = req.body;
@@ -77,6 +78,20 @@ exports.verifierElegibilite = asyncHandler(async (req, res) => {
     montantInvestissement: data.montantInvestissement,
     programmesEligibles: eligibleProgramNamesAndLinks.map((p) => p.name),
   });
+
+  if (eligibleProgramNamesAndLinks.length > 0) {
+    await sendEmail(
+      data.email,
+      "Résultat de votre test d'éligibilité",
+      "Félicitations ! Vous êtes éligible à certains programmes."
+    );
+  } else {
+    await sendEmail(
+      data.email,
+      "Résultat de votre test d'éligibilité",
+      "Nous sommes désolés, vous n'êtes éligible à aucun programme pour le moment."
+    );
+  }
 
   return api.created(res, { programs: eligibleProgramNamesAndLinks });
 });
