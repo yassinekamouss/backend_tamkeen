@@ -17,7 +17,7 @@ app.use(express.json());
 
 
 app.get("/", (req, res) => {
-  res.send("API is running...");
+  res.send("API is running on https://backendtamkeen-a8f551795f89.herokuapp.com/ on port 5000 ...");
 });
 // Import routes
 const testRoutes = require("./routes/testRoutes");
