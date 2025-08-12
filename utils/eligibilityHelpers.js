@@ -22,7 +22,10 @@ function getPrograms(programs, formData) {
     }
 
     if (isEligible) {
-      eligiblePrograms.push(program.name);
+      eligiblePrograms.push({
+        name: program.name,
+        link: program.link || "#"
+    });
     }
   }
 

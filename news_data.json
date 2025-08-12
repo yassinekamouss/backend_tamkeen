@@ -1,0 +1,118 @@
+[
+{
+  "_id": {
+    "$oid": "689a876070807deb369e6b17"
+  },
+  "id": 1,
+  "title": "Nouvelle subvention européenne pour l'innovation : 500 000 € disponibles",
+  "excerpt": "L'Union Européenne lance un nouveau programme de subventions pour les startups innovantes. Tamkeen vous accompagne dans votre candidature.",
+  "content": "L'Union Européenne vient d'annoncer l'ouverture d'un nouveau programme de subventions destiné aux startups innovantes avec un budget total de 50 millions d'euros. Les entreprises peuvent obtenir jusqu'à 500 000 € pour développer leurs projets technologiques. Notre équipe Tamkeen vous accompagne gratuitement dans la préparation de votre dossier de candidature et augmente vos chances de succès. Nous avons déjà aidé 45 entreprises à obtenir cette subvention l'année dernière.",
+  "image": "https://picsum.photos/600/300?random=1",
+  "category": "Subventions Européennes",
+  "publishedAt": "2025-08-10T10:00:00Z",
+  "author": "Équipe Tamkeen",
+  "featured": true,
+  "externalUrl": ""
+},
+{
+  "_id": {
+    "$oid": "689a879670807deb369e6b1d"
+  },
+  "author": "Équipe Tamkeen",
+  "category": "Subventions Européennes",
+  "content": "L'Union Européenne vient d'annoncer l'ouverture d'un nouveau programme de subventions destiné aux startups innovantes avec un budget total de 50 millions d'euros. Les entreprises peuvent obtenir jusqu'à 500 000 € pour développer leurs projets technologiques. Notre équipe Tamkeen vous accompagne gratuitement dans la préparation de votre dossier de candidature et augmente vos chances de succès. Nous avons déjà aidé 45 entreprises à obtenir cette subvention l'année dernière.",
+  "excerpt": "L'Union Européenne lance un nouveau programme de subventions pour les startups innovantes. Tamkeen vous accompagne dans votre candidature.",
+  "externalUrl": "",
+  "featured": true,
+  "id": 1,
+  "image": "https://picsum.photos/600/300?random=1",
+  "publishedAt": "2025-08-10T10:00:00Z",
+  "title": "Nouvelle subvention européenne pour l'innovation : 500 000 € disponibles",
+  "slug": "nouvelle-subvention-europeenne-innovation-500000-euros",
+  "published": true
+},
+{
+  "_id": {
+    "$oid": "689a879670807deb369e6b1e"
+  },
+  "author": "Dr. Amina Ben Salem",
+  "category": "Formation",
+  "content": "Tamkeen organise une formation intensive de 3 jours pour vous apprendre à préparer des dossiers de subvention convaincants. Vous découvrirez les erreurs les plus courantes à éviter, les éléments clés que recherchent les évaluateurs, et les techniques de présentation qui maximisent vos chances d'obtenir un financement. Plus de 200 entrepreneurs ont déjà bénéficié de cette formation avec un taux de réussite de 78% pour leurs demandes de subventions.",
+  "excerpt": "Rejoignez notre atelier pratique pour maîtriser les techniques de rédaction qui font la différence dans vos demandes de financement.",
+  "externalUrl": "",
+  "featured": false,
+  "id": 2,
+  "image": "https://picsum.photos/600/300?random=2",
+  "publishedAt": "2025-08-09T14:30:00Z",
+  "title": "Formation gratuite : Comment préparer un dossier de subvention gagnant",
+  "slug": "formation-gratuite-preparer-dossier-subvention",
+  "published": true
+},
+{
+  "_id": {
+    "$oid": "689a879670807deb369e6b1f"
+  },
+  "author": "Mohamed Trabelsi",
+  "category": "Subventions Nationales",
+  "content": "Le Ministère de l'Emploi vient de relancer son programme de subventions destiné aux jeunes entrepreneurs tunisiens. Chaque projet peut recevoir jusqu'à 50 000 DT de financement direct plus un accompagnement technique. Les candidatures sont ouvertes jusqu'au 30 septembre 2025. Tamkeen vous aide à identifier si votre projet est éligible et vous accompagne dans toutes les démarches administratives. Nous avons un taux de réussite de 85% pour ce type de subvention.",
+  "excerpt": "Le gouvernement tunisien relance son programme de soutien à l'entrepreneuriat jeune avec des subventions pouvant atteindre 50 000 DT.",
+  "externalUrl": "",
+  "featured": true,
+  "id": 3,
+  "image": "https://picsum.photos/600/300?random=3",
+  "publishedAt": "2025-08-08T09:15:00Z",
+  "title": "Subvention gouvernementale pour l'emploi des jeunes : 50 000 DT par projet",
+  "slug": "subvention-gouvernementale-emploi-jeunes-50000dt",
+  "published": true
+},
+{
+  "_id": {
+    "$oid": "689a879670807deb369e6b20"
+  },
+  "author": "Service Communication",
+  "category": "Success Stories",
+  "content": "TechnoVert, startup spécialisée dans les solutions de recyclage intelligent, vient d'obtenir une subvention de 300 000 € du programme Horizon Europe. L'entreprise avait essuyé deux refus avant de faire appel à Tamkeen. Notre équipe a restructuré entièrement leur dossier, identifié les bons programmes de financement et les a préparés aux entretiens. Aujourd'hui, TechnoVert emploie 12 personnes et développe ses solutions à l'international. 'Sans Tamkeen, nous n'aurions jamais réussi à naviguer dans la complexité des dossiers européens', témoigne Salma Maalej, fondatrice.",
+  "excerpt": "Découvrez comment nous avons aidé cette startup environnementale à décrocher une subvention européenne majeure.",
+  "externalUrl": "",
+  "featured": true,
+  "id": 4,
+  "image": "https://picsum.photos/600/300?random=4",
+  "publishedAt": "2025-08-07T16:45:00Z",
+  "title": "Success Story : TechnoVert obtient 300 000 € grâce à notre accompagnement",
+  "slug": "success-story-technovert-300000-euros",
+  "published": true
+},
+{
+  "_id": {
+    "$oid": "689a879670807deb369e6b21"
+  },
+  "author": "Équipe Partenariats",
+  "category": "Entrepreneuriat Féminin",
+  "content": "L'Agence américaine pour le développement international (USAID) a ouvert les candidatures pour son programme de soutien à l'entrepreneuriat féminin en Tunisie. Avec un budget de 10 millions de dollars, ce programme vise à financer 500 projets dirigés par des femmes. Les subventions vont de 5 000 à 100 000 dollars selon la taille du projet. Tamkeen a été sélectionné comme partenaire officiel pour accompagner les candidates tunisiennes. Nous organisons des sessions d'information gratuites chaque semaine.",
+  "excerpt": "L'USAID lance un programme spécial de 10 millions de dollars pour soutenir les femmes entrepreneures en Tunisie.",
+  "externalUrl": "",
+  "featured": false,
+  "id": 5,
+  "image": "https://picsum.photos/600/300?random=5",
+  "publishedAt": "2025-08-06T11:20:00Z",
+  "title": "Subventions USAID pour l'entrepreneuriat féminin : candidatures ouvertes",
+  "slug": "subventions-usaid-entrepreneuriat-feminin",
+  "published": true
+},
+{
+  "_id": {
+    "$oid": "689a879670807deb369e6b22"
+  },
+  "author": "Équipe Recherche",
+  "category": "Guides & Ressources",
+  "content": "Tamkeen publie son guide annuel des organismes de financement accessibles aux PME tunisiennes. Ce document de 50 pages détaille 15 sources de financement différentes : subventions européennes, programmes gouvernementaux, fondations privées, et organismes internationaux. Pour chaque source, vous trouverez les critères d'éligibilité, les montants disponibles, les dates de candidature et les conseils pour optimiser vos chances. Ce guide est le fruit de notre expérience de 5 ans dans l'accompagnement de plus de 1000 entreprises.",
+  "excerpt": "Notre nouveau guide répertorie toutes les sources de financement disponibles pour les PME avec les critères d'éligibilité détaillés.",
+  "externalUrl": "",
+  "featured": false,
+  "id": 6,
+  "image": "https://picsum.photos/600/300?random=6",
+  "publishedAt": "2025-08-05T13:00:00Z",
+  "title": "Guide complet : 15 organismes de financement accessibles aux PME tunisiennes",
+  "slug": "guide-15-organismes-financement-pme-tunisiennes",
+  "published": true
+}]

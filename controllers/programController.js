@@ -1,110 +1,137 @@
-const Program = require("../models/Program"); 
+const Program = require("../models/Program");
 const mongoose = require("mongoose");
+const asyncHandler = require("../utils/asyncHandler");
+const api = require("../utils/apiResponse");
 
 // Créer un programme
-exports.createProgram = async (req, res) => {
-  try {
-    const newProgram = new Program(req.body);
-    const savedProgram = await newProgram.save();
-    return res.status(201).json(savedProgram);
-  } catch (error) {
-    console.error("Erreur lors de la création du programme :", error);
-    return res.status(500).json({ message: "Erreur serveur" });
-  }
-};
+exports.createProgram = asyncHandler(async (req, res) => {
+  const newProgram = new Program(req.body);
+  const savedProgram = await newProgram.save();
+  return api.created(res, { program: savedProgram });
+});
 
 // Obtenir tous les programmes
-exports.getAllPrograms = async (req, res) => {
-  try {
-    const programs = await Program.find();
-    return res.status(200).json(programs);
-  } catch (error) {
-    console.error("Erreur lors de la récupération des programmes :", error);
-    return res.status(500).json({ message: "Erreur serveur" });
-  }
-};
+exports.getAllPrograms = asyncHandler(async (req, res) => {
+  const programs = await Program.find();
+  // Frontend expects a raw array
+  return res.status(200).json(programs);
+});
 
 // Obtenir un programme par ID
-exports.getProgramById = async (req, res) => {
+exports.getProgramById = asyncHandler(async (req, res) => {
   const { id } = req.params;
   if (!mongoose.Types.ObjectId.isValid(id)) {
-    return res.status(400).json({ message: "ID invalide" });
+    return api.error(res, "ID invalide", 400);
   }
-
-  try {
-    const program = await Program.findById(id);
-    if (!program) {
-      return res.status(404).json({ message: "Programme non trouvé" });
-    }
-    return res.status(200).json(program);
-  } catch (error) {
-    console.error("Erreur lors de la récupération du programme :", error);
-    return res.status(500).json({ message: "Erreur serveur" });
+  const program = await Program.findById(id);
+  if (!program) {
+    return api.error(res, "Programme non trouvé", 404);
   }
-};
+  return api.ok(res, { program });
+});
 
 // Mettre à jour un programme
-exports.updateProgram = async (req, res) => {
+exports.updateProgram = asyncHandler(async (req, res) => {
   const { id } = req.params;
   if (!mongoose.Types.ObjectId.isValid(id)) {
-    return res.status(400).json({ message: "ID invalide" });
+    return api.error(res, "ID invalide", 400);
   }
-
-  try {
-    const updatedProgram = await Program.findByIdAndUpdate(id, req.body, {
-      new: true,
-      runValidators: true,
-    });
-
-    if (!updatedProgram) {
-      return res.status(404).json({ message: "Programme non trouvé" });
-    }
-
-    return res.status(200).json(updatedProgram);
-  } catch (error) {
-    console.error("Erreur lors de la mise à jour :", error);
-    return res.status(500).json({ message: "Erreur serveur" });
+  const updatedProgram = await Program.findByIdAndUpdate(id, req.body, {
+    new: true,
+    runValidators: true,
+  });
+  if (!updatedProgram) {
+    return api.error(res, "Programme non trouvé", 404);
   }
-};
+  return api.ok(res, { program: updatedProgram });
+});
 
 // Supprimer un programme
-exports.deleteProgram = async (req, res) => {
+exports.deleteProgram = asyncHandler(async (req, res) => {
   const { id } = req.params;
   if (!mongoose.Types.ObjectId.isValid(id)) {
-    return res.status(400).json({ message: "ID invalide" });
+    return api.error(res, "ID invalide", 400);
   }
-
-  try {
-    const deletedProgram = await Program.findByIdAndDelete(id);
-    if (!deletedProgram) {
-      return res.status(404).json({ message: "Programme non trouvé" });
-    }
-    return res.status(200).json({ message: "Programme supprimé avec succès" });
-  } catch (error) {
-    console.error("Erreur lors de la suppression :", error);
-    return res.status(500).json({ message: "Erreur serveur" });
+  const deletedProgram = await Program.findByIdAndDelete(id);
+  if (!deletedProgram) {
+    return api.error(res, "Programme non trouvé", 404);
   }
-};
+  return api.ok(res, { message: "Programme supprimé avec succès" });
+});
 
 // Activer/désactiver un programme
-exports.toggleProgramActive = async (req, res) => {
+exports.toggleProgramActive = asyncHandler(async (req, res) => {
   const { id } = req.params;
   if (!mongoose.Types.ObjectId.isValid(id)) {
-    return res.status(400).json({ message: "ID invalide" });
+    return api.error(res, "ID invalide", 400);
+  }
+  const program = await Program.findById(id);
+  if (!program) {
+    return api.error(res, "Programme non trouvé", 404);
+  }
+  program.isActive = !program.isActive;
+  await program.save();
+  return api.ok(res, {
+    message: `Programme ${program.isActive ? "activé" : "désactivé"}`,
+    program,
+  });
+});
+
+
+// Mettre à jour les données hero d'un programme
+exports.updateProgramHero = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return api.error(res, "ID invalide", 400);
+  }
+  
+  const program = await Program.findById(id);
+  if (!program) {
+    return api.error(res, "Programme non trouvé", 404);
   }
 
-  try {
-    const program = await Program.findById(id);
-    if (!program) {
-      return res.status(404).json({ message: "Programme non trouvé" });
-    }
-
-    program.isActive = !program.isActive;
-    await program.save();
-
-    return res.status(200).json({ message: `Programme ${program.isActive ? "activé" : "désactivé"}`, program });
-  } catch (error) {
-    console.error("Erreur lors du changement d'état :", error);
-    return res.status(500).json({ message: "Erreur serveur" });
+  // Si on désactive isHero, on peut vider les autres champs
+  if (!req.body.isHero) {
+    program.hero = {
+      isHero: false,
+      image: "",
+      titleFr: "",
+      titleAr: "",
+      subtitleFr: "",
+      subtitleAr: "",
+      descriptionFr: "",
+      descriptionAr: ""
+    };
+  } else {
+    // Si on active isHero, on met à jour avec les données fournies
+    program.hero = {
+      isHero: true,
+      image: req.body.image || "",
+      titleFr: req.body.titleFr || "",
+      titleAr: req.body.titleAr || "",
+      subtitleFr: req.body.subtitleFr || "",
+      subtitleAr: req.body.subtitleAr || "",
+      descriptionFr: req.body.descriptionFr || "",
+      descriptionAr: req.body.descriptionAr || ""
+    };
   }
-};
+
+  await program.save();
+
+  return api.ok(res, {
+    message: program.hero.isHero ? "Programme publié avec succès" : "Programme dépublié avec succès",
+    program
+  });
+});
+
+
+// Obtenir les programmes publiés (hero)
+exports.getHeroPrograms = asyncHandler(async (req, res) => {
+  const heroPrograms = await Program.find({ 
+    "hero.isHero": true,
+    isActive: true 
+  }).select('hero');
+  
+  return res.status(200).json(heroPrograms);
+});
