@@ -20,6 +20,7 @@ const programSchema = new mongoose.Schema({
     anneeCreation: [String],
     region: [String]
   },
+  nombreBeneficiaires: { type: Number, default: 0 }
 });
 
 
