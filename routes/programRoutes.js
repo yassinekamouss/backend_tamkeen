@@ -6,6 +6,7 @@ const validate = require("../middlewares/validate");
 
 // Public
 router.get("/", programController.getAllPrograms);
+router.get("/hero", programController.getHeroPrograms);
 router.get("/:id", programController.getProgramById);
 
 // Admin protected
@@ -35,3 +36,18 @@ router.patch(
 );
 
 module.exports = router;
+
+
+router.put(
+  "/:id/hero",
+  authAdmin,
+  validate({ 
+    params: { id: { required: true, type: "string" } },
+    body: {
+      isHero: { required: true, type: "boolean" }
+      // Les autres champs ne sont pas requis car ils peuvent être vides si isHero = false
+    }
+  }),
+  programController.updateProgramHero
+);
+

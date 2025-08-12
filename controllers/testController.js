@@ -7,6 +7,7 @@ const api = require("../utils/apiResponse");
 const sendEmail = require("../utils/email");
 
 exports.verifierElegibilite = asyncHandler(async (req, res) => {
+  try{
   const data = req.body;
 
   let personne = await Personne.findOne({ email: data.email });
@@ -94,6 +95,18 @@ exports.verifierElegibilite = asyncHandler(async (req, res) => {
   }
 
   return api.created(res, { programs: eligibleProgramNamesAndLinks });
+} catch (err) {
+    // 🔹 Gestion spécifique des erreurs de clé dupliquée
+    if (err.code === 11000) {
+      if (err.keyPattern && err.keyPattern.telephone) {
+        return api.error(res, "Ce numéro de téléphone est déjà utilisé par une autre personne physique ou entreprise avec des informations différentes.", 400);
+      }
+     
+    }
+
+    console.error(err);
+    return api.error(res, "Erreur lors de la vérification d'éligibilité", 500);
+  }
 });
 
 // Définitions des fonctions
