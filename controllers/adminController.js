@@ -119,6 +119,7 @@ exports.loginAdmin = async (req, res) => {
 };
 
 
+
 exports.getAllAdmins = async (req, res) => {
   try {
     const admins = await Admin.find().select("-password"); // Exclure le mdp
