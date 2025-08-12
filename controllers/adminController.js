@@ -28,6 +28,8 @@ exports.loginAdmin = async (req, res) => {
   }
 };
 
+
+
 // POST /api/admin/register 
 exports.registerAdmin = async (req, res) => {
   const { email, password } = req.body;
