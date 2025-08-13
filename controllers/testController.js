@@ -65,7 +65,7 @@ exports.verifierElegibilite = asyncHandler(async (req, res) => {
   const eligibleProgramNamesAndLinks = getPrograms(activePrograms, data);
 
   // Créer un nouveau test pour cette personne
-  await TestElegibilite.create({
+  const created = await TestElegibilite.create({
     personne: personne._id,
     secteurTravail: data.secteurTravail,
     region: data.region,
@@ -79,6 +79,34 @@ exports.verifierElegibilite = asyncHandler(async (req, res) => {
     montantInvestissement: data.montantInvestissement,
     programmesEligibles: eligibleProgramNamesAndLinks.map((p) => p.name),
   });
+
+  // Émettre l'événement aux admins connectés (si Socket.IO est initialisé)
+  try {
+    const io = req.app.get("io");
+    if (io) {
+      io.to("admins").emit("form:submitted", {
+        id: String(created._id),
+        createdAt: created.createdAt,
+        applicant: {
+          id: String(personne._id),
+          type: personne.applicantType,
+          name:
+            personne.applicantType === "morale"
+              ? personne.nomEntreprise
+              : `${personne.nom || ""} ${personne.prenom || ""}`.trim(),
+          email: personne.email,
+        },
+        formType: "eligibility",
+        region: created.region,
+        eligible: eligibleProgramNamesAndLinks.length > 0,
+        summary: eligibleProgramNamesAndLinks.length
+          ? `${eligibleProgramNamesAndLinks.length} programme(s) éligible(s)`
+          : "Aucun programme éligible",
+      });
+    }
+  } catch (e) {
+    console.warn("Socket emit failed:", e?.message || e);
+  }
 
   if (eligibleProgramNamesAndLinks.length > 0) {
     await sendEmail(

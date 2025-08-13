@@ -5,11 +5,22 @@ const Sentry = require("./instrument");
 
 const express = require("express");
 const cors = require("cors");
+const http = require("http");
+const { Server } = require("socket.io");
+const jwt = require("jsonwebtoken");
 const connectDB = require("./config/db");
+const Admin = require("./models/Admin");
 
 const app = express();
 // Middlewares
-app.use(cors());
+app.use(
+  cors({
+    origin:
+      (process.env.FRONTEND_ORIGIN && process.env.FRONTEND_ORIGIN.split(",")) ||
+      ["http://localhost:5173"],
+    credentials: true,
+  })
+);
 app.use(express.json());
 
 app.get("/", (req, res) => {
@@ -54,13 +65,52 @@ Sentry.setupExpressErrorHandler(app);
 
 const PORT = process.env.PORT || 5000;
 
+// Create HTTP server and attach Socket.IO
+const server = http.createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin:
+      (process.env.FRONTEND_ORIGIN && process.env.FRONTEND_ORIGIN.split(",")) ||
+      ["http://localhost:5173"],
+    credentials: true,
+  },
+});
+
+// Socket auth for admins
+io.use(async (socket, next) => {
+  try {
+    const token =
+      socket.handshake.auth?.token ||
+      (socket.handshake.headers?.authorization || "").replace(/^Bearer\s+/i, "");
+
+    if (!token) return next(new Error("unauthorized"));
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const admin = await Admin.findById(decoded.id).select("_id role");
+    if (!admin) return next(new Error("unauthorized"));
+
+    socket.data.admin = { id: String(admin._id), role: admin.role };
+    next();
+  } catch (e) {
+    return next(new Error("unauthorized"));
+  }
+});
+
+io.on("connection", (socket) => {
+  // Join admins room
+  socket.join("admins");
+});
+
+// Expose io to routes/controllers
+app.set("io", io);
+
 
 async function startServer() {
   try {
     await connectDB(); // attendre la connexion DB
 
     require("./scripts/deactivateExpiredPrograms");
-    app.listen(PORT, () => {
+    server.listen(PORT, () => {
       console.log(`Server running on http://localhost:${PORT}`);
     });
   } catch (error) {
