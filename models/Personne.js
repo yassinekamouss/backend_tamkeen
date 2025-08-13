@@ -13,6 +13,13 @@ const PersonneSchema = new mongoose.Schema(
     email: { type: String, required: true, unique: true },
     telephone: { type: String, required: true, unique: true },
     age: { type: Number, min: 18, max: 100 }, // pour physique
+    etat: { type: String, enum: ["En traitement", "En attente", "Terminé"], default: "En attente" },
+    //ID du consultant associé
+    consultantAssocie: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Admin",
+          required: true,
+        },
   },
   { timestamps: true }
 );
