@@ -15,19 +15,18 @@ const app = express();
 // Middlewares
 app.use(
   cors({
-    origin:
-      (process.env.FRONTEND_ORIGIN && process.env.FRONTEND_ORIGIN.split(",")) ||
-      ["http://localhost:5173"],
+    origin: (process.env.FRONTEND_ORIGIN &&
+      process.env.FRONTEND_ORIGIN.split(",")) || ["http://localhost:5173"],
     credentials: true,
   })
 );
 app.use(express.json());
 
 app.get("/", (req, res) => {
-  res.send("API is running on https://backendtamkeen-a8f551795f89.herokuapp.com/ on port 5000 ...");
+  res.send(
+    "API is running on https://backendtamkeen-a8f551795f89.herokuapp.com/ on port 5000 ..."
+  );
 });
-
-
 
 // Import routes
 const testRoutes = require("./routes/testRoutes");
@@ -62,16 +61,14 @@ app.get("/debug-sentry", (req, res) => {
 // Middleware de capture des erreurs (nouvelle API)
 Sentry.setupExpressErrorHandler(app);
 
-
 const PORT = process.env.PORT || 5000;
 
 // Create HTTP server and attach Socket.IO
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin:
-      (process.env.FRONTEND_ORIGIN && process.env.FRONTEND_ORIGIN.split(",")) ||
-      ["http://localhost:5173"],
+    origin: (process.env.FRONTEND_ORIGIN &&
+      process.env.FRONTEND_ORIGIN.split(",")) || ["http://localhost:5173"],
     credentials: true,
   },
 });
@@ -81,7 +78,10 @@ io.use(async (socket, next) => {
   try {
     const token =
       socket.handshake.auth?.token ||
-      (socket.handshake.headers?.authorization || "").replace(/^Bearer\s+/i, "");
+      (socket.handshake.headers?.authorization || "").replace(
+        /^Bearer\s+/i,
+        ""
+      );
 
     if (!token) return next(new Error("unauthorized"));
 
@@ -104,7 +104,6 @@ io.on("connection", (socket) => {
 // Expose io to routes/controllers
 app.set("io", io);
 
-
 async function startServer() {
   try {
     await connectDB(); // attendre la connexion DB
@@ -117,6 +116,5 @@ async function startServer() {
     console.error("Failed to connect to DB, server not started", error);
     process.exit(1); // optionnel : quitter le processus en cas d’erreur critique
   }
-
-};
+}
 startServer();
