@@ -22,7 +22,7 @@ exports.registerAdmin = async (req, res) => {
       email,
       password: hashedPassword,
       username,
-      role: role || "admin", // Par défaut admin
+      role: role || "Consultant",
     });
 
     await newAdmin.save();
@@ -66,7 +66,7 @@ exports.updateAdmin = async (req, res) => {
     res.status(200).json({
       message: "Admin modifié avec succès.",
       admin: {
-        id: admin._id,
+        _id: admin._id,
         email: admin.email,
         username: admin.username,
         role: admin.role,
@@ -106,7 +106,7 @@ exports.loginAdmin = async (req, res) => {
       message: "Connexion réussie.",
       token,
       admin: {
-        id: admin._id,
+        _id: admin._id,
         email: admin.email,
         username: admin.username,
         role: admin.role,
