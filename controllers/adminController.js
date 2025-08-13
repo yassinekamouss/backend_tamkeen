@@ -78,6 +78,7 @@ exports.updateAdmin = async (req, res) => {
   }
 };
 
+
 // POST /api/admin/login
 exports.loginAdmin = async (req, res) => {
   const { email, password } = req.body;
@@ -119,7 +120,7 @@ exports.loginAdmin = async (req, res) => {
 };
 
 
-
+// GET /api/admin/
 exports.getAllAdmins = async (req, res) => {
   try {
     const admins = await Admin.find().select("-password"); // Exclure le mdp
@@ -131,6 +132,7 @@ exports.getAllAdmins = async (req, res) => {
 };
 
 
+// DELETE /api/admin/
 exports.deleteAdmin = async (req, res) => {
   const { id } = req.params;
 

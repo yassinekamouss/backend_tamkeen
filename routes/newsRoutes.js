@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const authAdmin = require("../middlewares/authAdmin");
 const {
   getAllNews,
   getNewsCategories,
@@ -16,12 +17,12 @@ router.get("/categories", getNewsCategories);
 
 // Routes admin (CRUD)
 // POST /api/news - Créer une nouvelle actualité
-router.post("/", createNews);
+router.post("/", authAdmin, createNews);
 
 // PUT /api/news/:id - Mettre à jour une actualité
-router.put("/:id", updateNews);
+router.put("/:id", authAdmin, updateNews);
 
 // DELETE /api/news/:id - Supprimer une actualité
-router.delete("/:id", deleteNews);
+router.delete("/:id", authAdmin, deleteNews);
 
 module.exports = router;
