@@ -18,7 +18,10 @@ const authAdmin = async (req, res, next) => {
     if (!admin) {
       return res
         .status(401)
-        .json({ success: false, message: "Compte administrateur introuvable ou supprimé." });
+        .json({
+          success: false,
+          message: "Compte administrateur introuvable ou supprimé.",
+        });
     }
 
     // Hydrater req.admin depuis la base pour éviter les rôles périmés
