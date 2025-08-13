@@ -2,13 +2,15 @@ const express = require("express");
 const router = express.Router();
 
 const { loginAdmin , registerAdmin , getAllAdmins ,deleteAdmin, updateAdmin } = require("../controllers/adminController");
+const authAdmin = require("../middlewares/authAdmin");
 
-
-router.get("/", getAllAdmins);
+// Public
 router.post("/login", loginAdmin);
 router.post("/register", registerAdmin);
-router.delete("/:id", deleteAdmin);
-router.put("/:id", updateAdmin); 
 
+// Protected
+router.get("/", authAdmin, getAllAdmins);
+router.delete("/:id", authAdmin, deleteAdmin);
+router.put("/:id", authAdmin, updateAdmin); 
 
 module.exports = router;
