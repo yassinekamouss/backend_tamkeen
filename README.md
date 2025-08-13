@@ -1,3 +1,13 @@
+## Realtime notifications
+
+Socket.IO is enabled to notify admins when a new eligibility test is submitted. Configure allowed frontend origins via ENV:
+
+```
+FRONTEND_ORIGIN=http://localhost:5173,https://your-frontend.example.com
+```
+
+Client connects with admin JWT in auth and receives `form:submitted` events in the `admins` room.
+
 # Tamkeen Backend API
 
 API Node.js/Express pour les tests d'éligibilité aux programmes de subvention, avec MongoDB/Mongoose.

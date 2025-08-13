@@ -7,101 +7,132 @@ const api = require("../utils/apiResponse");
 const sendEmail = require("../utils/email");
 
 exports.verifierElegibilite = asyncHandler(async (req, res) => {
-  try{
-  const data = req.body;
+  try {
+    const data = req.body;
 
-  let personne = await Personne.findOne({ email: data.email });
+    let personne = await Personne.findOne({ email: data.email });
 
-  if (personne) {
-    if (data.applicantType === "physique") {
-      const infosIdentiques =
-        personne.nom === data.nom &&
-        personne.prenom === data.prenom &&
-        Number(personne.age) === Number(data.age) &&
-        personne.sexe === data.sexe &&
-        personne.telephone === data.telephone;
+    if (personne) {
+      if (data.applicantType === "physique") {
+        const infosIdentiques =
+          personne.nom === data.nom &&
+          personne.prenom === data.prenom &&
+          Number(personne.age) === Number(data.age) &&
+          personne.sexe === data.sexe &&
+          personne.telephone === data.telephone;
 
-      if (!infosIdentiques) {
-        return api.error(
-          res,
-          "Cet email est déjà utilisé par une autre personne physique avec des informations différentes.",
-          400
-        );
-      }
-    } else if (data.applicantType === "morale") {
-      const infosIdentiques =
-        personne.nomEntreprise === data.nomEntreprise &&
-        personne.email === data.email &&
-        personne.telephone === data.telephone;
+        if (!infosIdentiques) {
+          return api.error(
+            res,
+            "Cet email est déjà utilisé par une autre personne physique avec des informations différentes.",
+            400
+          );
+        }
+      } else if (data.applicantType === "morale") {
+        const infosIdentiques =
+          personne.nomEntreprise === data.nomEntreprise &&
+          personne.email === data.email &&
+          personne.telephone === data.telephone;
 
-      if (!infosIdentiques) {
-        return api.error(
-          res,
-          "Cet email est déjà utilisé par une autre entreprise avec des informations différentes.",
-          400
-        );
+        if (!infosIdentiques) {
+          return api.error(
+            res,
+            "Cet email est déjà utilisé par une autre entreprise avec des informations différentes.",
+            400
+          );
+        }
+      } else {
+        return api.error(res, "Type de demandeur inconnu ou non valide.", 400);
       }
     } else {
-      return api.error(res, "Type de demandeur inconnu ou non valide.", 400);
+      // Créer la personne si elle n'existe pas
+      personne = await Personne.create({
+        applicantType: data.applicantType,
+        nom: data.nom,
+        prenom: data.prenom,
+        age: data.age,
+        sexe: data.sexe,
+        nomEntreprise: data.nomEntreprise,
+        email: data.email,
+        telephone: data.telephone,
+      });
     }
-  } else {
-    // Créer la personne si elle n'existe pas
-    personne = await Personne.create({
-      applicantType: data.applicantType,
-      nom: data.nom,
-      prenom: data.prenom,
-      age: data.age,
-      sexe: data.sexe,
-      nomEntreprise: data.nomEntreprise,
-      email: data.email,
-      telephone: data.telephone,
+
+    // Récupérer tous les programmes actifs
+    const activePrograms = await Program.find({ isActive: true });
+
+    // Trouver les programmes éligibles
+    const eligibleProgramNamesAndLinks = getPrograms(activePrograms, data);
+
+    // Créer un nouveau test pour cette personne
+    const created = await TestElegibilite.create({
+      personne: personne._id,
+      secteurTravail: data.secteurTravail,
+      region: data.region,
+      statutJuridique: data.statutJuridique,
+      anneeCreation: data.anneeCreation,
+      chiffreAffaires: {
+        chiffreAffaire2022: parseFloat(data.chiffreAffaire2022) || undefined,
+        chiffreAffaire2023: parseFloat(data.chiffreAffaire2023) || undefined,
+        chiffreAffaire2024: parseFloat(data.chiffreAffaire2024) || undefined,
+      },
+      montantInvestissement: data.montantInvestissement,
+      programmesEligibles: eligibleProgramNamesAndLinks.map((p) => p.name),
     });
-  }
 
-  // Récupérer tous les programmes actifs
-  const activePrograms = await Program.find({ isActive: true });
+    // Émettre l'événement aux admins connectés (si Socket.IO est initialisé)
+    try {
+      const io = req.app.get("io");
+      if (io) {
+        io.to("admins").emit("form:submitted", {
+          id: String(created._id),
+          createdAt: created.createdAt,
+          applicant: {
+            id: String(personne._id),
+            type: personne.applicantType,
+            name:
+              personne.applicantType === "morale"
+                ? personne.nomEntreprise
+                : `${personne.nom || ""} ${personne.prenom || ""}`.trim(),
+            email: personne.email,
+          },
+          formType: "eligibility",
+          region: created.region,
+          eligible: eligibleProgramNamesAndLinks.length > 0,
+          summary: eligibleProgramNamesAndLinks.length
+            ? `${eligibleProgramNamesAndLinks.length} programme(s) éligible(s)`
+            : "Aucun programme éligible",
+        });
+      }
+    } catch (e) {
+      console.warn("Socket emit failed:", e?.message || e);
+    }
 
-  // Trouver les programmes éligibles
-  const eligibleProgramNamesAndLinks = getPrograms(activePrograms, data);
+    if (eligibleProgramNamesAndLinks.length > 0) {
+      await sendEmail(
+        data.email,
+        "Résultat de votre test d'éligibilité",
+        "Félicitations ! Vous êtes éligible à certains programmes."
+      );
+    } else {
+      await sendEmail(
+        data.email,
+        "Résultat de votre test d'éligibilité",
+        "Nous sommes désolés, vous n'êtes éligible à aucun programme pour le moment."
+      );
+    }
 
-  // Créer un nouveau test pour cette personne
-  await TestElegibilite.create({
-    personne: personne._id,
-    secteurTravail: data.secteurTravail,
-    region: data.region,
-    statutJuridique: data.statutJuridique,
-    anneeCreation: data.anneeCreation,
-    chiffreAffaires: {
-      chiffreAffaire2022: parseFloat(data.chiffreAffaire2022) || undefined,
-      chiffreAffaire2023: parseFloat(data.chiffreAffaire2023) || undefined,
-      chiffreAffaire2024: parseFloat(data.chiffreAffaire2024) || undefined,
-    },
-    montantInvestissement: data.montantInvestissement,
-    programmesEligibles: eligibleProgramNamesAndLinks.map((p) => p.name),
-  });
-
-  if (eligibleProgramNamesAndLinks.length > 0) {
-    await sendEmail(
-      data.email,
-      "Résultat de votre test d'éligibilité",
-      "Félicitations ! Vous êtes éligible à certains programmes."
-    );
-  } else {
-    await sendEmail(
-      data.email,
-      "Résultat de votre test d'éligibilité",
-      "Nous sommes désolés, vous n'êtes éligible à aucun programme pour le moment."
-    );
-  }
-
-  return api.created(res, { programs: eligibleProgramNamesAndLinks });
-} catch (err) {
+    return api.created(res, { programs: eligibleProgramNamesAndLinks });
+  } catch (err) {
     // 🔹 Gestion spécifique des erreurs de clé dupliquée
     if (err.code === 11000) {
       if (err.keyPattern && err.keyPattern.telephone) {
-        return api.error(res, "Ce numéro de téléphone est déjà utilisé par une autre personne physique ou entreprise avec des informations différentes.", 400);
+        return api.error(
+          res,
+          "Ce numéro de téléphone est déjà utilisé par une autre personne physique ou entreprise avec des informations différentes.",
+          400
+        );
       }
-     
     }
 
     console.error(err);
