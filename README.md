@@ -61,6 +61,7 @@ API Node.js/Express pour les tests d'éligibilité aux programmes de subvention,
 ## Conventions & qualité
 
 - Middleware d'erreurs centralisé (`middlewares/errorHandler.js`).
+- Middleware d'autorisation par rôle (`middlewares/authorizeRole.js`).
 - Handlers asynchrones enveloppés (`utils/asyncHandler.js`).
 - Réponses standardisées (`utils/apiResponse.js`).
 - Validation légère des requêtes (`middlewares/validate.js`).
