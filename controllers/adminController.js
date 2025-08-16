@@ -106,7 +106,7 @@ exports.loginAdmin = async (req, res) => {
     res.cookie("adminToken", token, {
       httpOnly: true,
       secure: isProd, // HTTPS seulement en prod
-      sameSite: isProd ? "None" : "Lax"
+      sameSite: isProd ? "None" : "Lax",
       maxAge: 24 * 60 * 60 * 1000 // 1 jour
     });
 
@@ -169,7 +169,7 @@ exports.logoutAdmin = (req, res) => {
   res.clearCookie("adminToken", {
     httpOnly: true,
     secure: isProd,
-    sameSite: isProd ? "None" : "Lax"
+    sameSite: isProd ? "None" : "Lax",
   });
 
   res.status(200).json({ message: "Déconnecté avec succès." });
