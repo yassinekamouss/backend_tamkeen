@@ -17,8 +17,7 @@ const PersonneSchema = new mongoose.Schema(
     //ID du consultant associé
     consultantAssocie: {
           type: mongoose.Schema.Types.ObjectId,
-          ref: "Admin",
-          required: true,
+          ref: "Admin"
         },
   },
   { timestamps: true }

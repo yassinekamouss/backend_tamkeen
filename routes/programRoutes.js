@@ -46,7 +46,6 @@ module.exports = router;
 router.put(
   "/:id/hero",
   authAdmin,
-  authorizeRole("Administrateur"),
   validate({ 
     params: { id: { required: true, type: "string" } },
     body: {

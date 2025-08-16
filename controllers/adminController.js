@@ -102,17 +102,25 @@ exports.loginAdmin = async (req, res) => {
       process.env.JWT_SECRET,
       { expiresIn: "1d" }
     );
-
-    res.status(200).json({
-      message: "Connexion réussie.",
-      token,
-      admin: {
-        _id: admin._id,
-        email: admin.email,
-        username: admin.username,
-        role: admin.role,
-      },
+  const isProd = process.env.NODE_ENV === "production";
+    res.cookie("adminToken", token, {
+      httpOnly: true,
+      secure: isProd, // HTTPS seulement en prod
+      sameSite: isProd ? "strict" : "lax",
+      maxAge: 24 * 60 * 60 * 1000 // 1 jour
     });
+
+
+      res.status(200).json({
+        message: "Connexion réussie.",
+        admin: {
+          _id: admin._id,
+          email: admin.email,
+          username: admin.username,
+          role: admin.role,
+        },
+      });
+
   } catch (err) {
     console.error("Erreur loginAdmin:", err);
     res.status(500).json({ message: "Erreur serveur." });
@@ -150,5 +158,38 @@ exports.deleteAdmin = async (req, res) => {
   } catch (err) {
     console.error("Erreur deleteAdmin:", err);
     res.status(500).json({ message: "Erreur serveur." });
+  }
+};
+
+
+// POST /api/admin/logout
+exports.logoutAdmin = (req, res) => {
+  const isProd = process.env.NODE_ENV === "production";
+
+  res.clearCookie("adminToken", {
+    httpOnly: true,
+    secure: isProd,
+   sameSite: isProd ? "strict" : "lax",
+  });
+
+  res.status(200).json({ message: "Déconnecté avec succès." });
+};
+
+
+
+// GET /api/admin/me
+exports.getAdminProfile = async (req, res) => {
+  try {
+    const admin = await Admin.findById(req.admin.id)
+      .select("_id username email role");
+
+    if (!admin) {
+      return res.status(404).json({ message: "Admin non trouvé." });
+    }
+
+    res.json({ admin });
+  } catch (error) {
+    console.error("Erreur getAdminProfile:", error);
+    res.status(500).json({ message: "Erreur serveur" });
   }
 };
