@@ -6,6 +6,7 @@ const {
   registerAdmin,
   getAllAdmins,
   deleteAdmin,
+  getOtherAdmins,
   updateAdmin,
   getAdminProfile, 
   logoutAdmin,
@@ -21,6 +22,7 @@ router.post("/logout", logoutAdmin);
 router.get("/", authAdmin, authorizeRole("Administrateur"), getAllAdmins);
 router.post("/register",authAdmin,authorizeRole("Administrateur"), registerAdmin);
 router.get("/me", authAdmin,getAdminProfile);
+router.get("/others", authAdmin, authorizeRole("Administrateur"), getOtherAdmins);
 router.delete("/:id", authAdmin ,authorizeRole("Administrateur"), deleteAdmin);
 router.put("/:id", authAdmin ,authorizeRole("Administrateur"), updateAdmin);
 
