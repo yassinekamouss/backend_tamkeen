@@ -3,6 +3,7 @@ const Admin = require("../models/Admin");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
+const sendEmail = require("../utils/email");
 
 // POST /api/admin/register
 exports.registerAdmin = async (req, res) => {
