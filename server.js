@@ -10,6 +10,8 @@ const { Server } = require("socket.io");
 const jwt = require("jsonwebtoken");
 const connectDB = require("./config/db");
 const Admin = require("./models/Admin");
+const cookieParser = require("cookie-parser");
+const cookie = require("cookie");
 
 const app = express();
 // Middlewares
@@ -20,12 +22,15 @@ app.use(
   })
 );
 app.use(express.json());
+app.use(cookieParser());
 
 app.get("/", (req, res) => {
   res.send(
     "API is running on https://backendtamkeen-a8f551795f89.herokuapp.com/ on port 5000 ..."
   );
 });
+
+
 
 // Import routes
 const testRoutes = require("./routes/testRoutes");
@@ -75,12 +80,11 @@ const io = new Server(server, {
 // Socket auth for admins
 io.use(async (socket, next) => {
   try {
-    const token =
-      socket.handshake.auth?.token ||
-      (socket.handshake.headers?.authorization || "").replace(
-        /^Bearer\s+/i,
-        ""
-      );
+   const cookies = socket.handshake.headers.cookie
+      ? cookie.parse(socket.handshake.headers.cookie)
+      : {};
+
+    const token = cookies.adminToken;
 
     if (!token) return next(new Error("unauthorized"));
 
