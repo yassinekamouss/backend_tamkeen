@@ -4,6 +4,7 @@ const userController = require("../controllers/userController");
 const authAdmin = require("../middlewares/authAdmin");
 
 router.get("/", authAdmin, userController.getAllUsers);
+router.get("/export", authAdmin, userController.exportUsers);
 router.get("/:id", authAdmin, userController.getUserById);
 router.put("/:id", authAdmin, userController.updateUser);
 

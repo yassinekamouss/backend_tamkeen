@@ -3,10 +3,10 @@ const Admin = require("../models/Admin");
 
 // Middleware d'authentification admin avec vérification d'existence en base
 const authAdmin = async (req, res, next) => {
- const token = req.cookies.adminToken;
-if (!token) {
-  return res.status(401).json({ success: false, message: "Token manquant." });
-}
+  const token = req.cookies.adminToken;
+  if (!token) {
+    return res.status(401).json({ success: false, message: "Token manquant." });
+  }
 
 
   try {

@@ -16,9 +16,9 @@ const PersonneSchema = new mongoose.Schema(
     etat: { type: String, enum: ["En traitement", "En attente", "Terminé"], default: "En attente" },
     //ID du consultant associé
     consultantAssocie: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "Admin"
-        },
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Admin"
+    },
   },
   { timestamps: true }
 );
