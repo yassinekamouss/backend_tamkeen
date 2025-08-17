@@ -15,7 +15,7 @@ exports.getAllUsers = asyncHandler(async (req, res) => {
 
 exports.exportUsers = asyncHandler(async (req, res) => {
   try {
-    const { applicantType, adminId } = req.query;
+    const { startDate, endDate, applicantType, adminId } = req.query;
 
     const filter = {};
     if (applicantType && applicantType !== "all") {
@@ -25,17 +25,31 @@ exports.exportUsers = asyncHandler(async (req, res) => {
       filter.consultantAssocie = adminId;
     }
 
-    // Récupérer les personnes et leur test associé
+    // Récupérer les personnes
     const personnes = await Personne.find(filter)
       .populate("consultantAssocie", "username")
       .lean();
 
-    // Charger les tests liés
-    const tests = await TestElegibilite.find({ personne: { $in: personnes.map(p => p._id) } }).lean();
+    // Préparer le filtre des tests
+    const testFilter = {
+      personne: { $in: personnes.map((p) => p._id) },
+    };
+
+    // Si on a reçu un domaine de date (intervalle)
+    if (startDate && endDate) {
+      testFilter.createdAt = {
+        $gte: new Date(startDate),
+        $lte: new Date(endDate),
+      };
+    }
+
+    // Charger les tests liés avec le filtre date
+    const tests = await TestElegibilite.find(testFilter).lean();
+
 
     // Associer chaque test à sa personne
     const testsMap = {};
-    tests.forEach(t => {
+    tests.forEach((t) => {
       testsMap[t.personne.toString()] = t;
     });
 
@@ -75,24 +89,25 @@ exports.exportUsers = asyncHandler(async (req, res) => {
       };
     });
 
-    // Remplir les données
-    personnes.forEach((p) => {
-      const test = testsMap[p._id.toString()];
+    // Remplir les données : UNE LIGNE PAR TEST
+    tests.forEach((test) => {
+      const personne = personnes.find((p) => p._id.toString() === test.personne.toString());
+      if (!personne) return; // sécurité
 
       worksheet.addRow({
-        prenom: p.prenom || "N/A",
-        nom: p.nom || "N/A",
-        nom_entreprise: p.nomEntreprise || "N/A",
-        type: p.applicantType || "N/A",
-        telephone: p.telephone || "N/A",
-        zone: test?.region || "N/A",
-        statut_juridique: test?.statutJuridique || "N/A",
-        secteur_activite: test?.secteurTravail || "N/A",
-        annee_creation: test?.anneeCreation || "N/A",
-        chiffre_affaires: test?.chiffreAffaires
+        prenom: personne.prenom || "N/A",
+        nom: personne.nom || "N/A",
+        nom_entreprise: personne.nomEntreprise || "N/A",
+        type: personne.applicantType || "N/A",
+        telephone: personne.telephone || "N/A",
+        zone: test.region || "N/A",
+        statut_juridique: test.statutJuridique || "N/A",
+        secteur_activite: test.secteurTravail || "N/A",
+        annee_creation: test.anneeCreation || "N/A",
+        chiffre_affaires: test.chiffreAffaires
           ? formatChiffreAffaires(test.chiffreAffaires)
           : "N/A",
-        est_eligible: test?.programmesEligibles?.length > 0 ? 1 : 0,
+        est_eligible: test.programmesEligibles?.length > 0 ? 1 : 0,
       });
     });
 
