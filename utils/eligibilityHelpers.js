@@ -1,4 +1,4 @@
-const criteresCheckers = require('./eligibilityCheckers');
+const criteresCheckers = require("./eligibilityCheckers");
 
 function getPrograms(programs, formData) {
   const eligiblePrograms = [];
@@ -7,10 +7,16 @@ function getPrograms(programs, formData) {
     const criteres = program.criteres;
     let isEligible = true;
 
-    for (const critere in criteres) {
-      const valeur = criteres[critere];
+    // Gestion de priorité: si chiffreAffaireParSecteur est défini et non vide, ignorer le champ global chiffreAffaire
+    const hasPerSectorCA =
+      Array.isArray(criteres.chiffreAffaireParSecteur) &&
+      criteres.chiffreAffaireParSecteur.length > 0;
 
-     
+    for (const critere in criteres) {
+      // Skip global CA if per-sector is provided
+      if (hasPerSectorCA && critere === "chiffreAffaire") continue;
+
+      const valeur = criteres[critere];
       const checker = criteresCheckers[critere];
       if (checker) {
         const result = checker(valeur, formData);
@@ -24,8 +30,8 @@ function getPrograms(programs, formData) {
     if (isEligible) {
       eligiblePrograms.push({
         name: program.name,
-        link: program.link || "#"
-    });
+        link: program.link || "#",
+      });
     }
   }
 
