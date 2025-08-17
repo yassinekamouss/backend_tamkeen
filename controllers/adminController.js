@@ -106,7 +106,7 @@ exports.loginAdmin = async (req, res) => {
     res.cookie("adminToken", token, {
       httpOnly: true,
       secure: isProd, // HTTPS seulement en prod
-      sameSite: isProd ? "None" : "Lax",
+      sameSite: isProd ? "strict" : "lax",
       maxAge: 24 * 60 * 60 * 1000 // 1 jour
     });
 
@@ -128,6 +128,20 @@ exports.loginAdmin = async (req, res) => {
 };
 
 
+// GET /api/admin/
+
+exports.getAllAdmins = async (req, res) => {
+  try {
+    const admins = await Admin.find().select("-password"); // Exclure le mdp
+    res.status(200).json(admins);
+  } catch (err) {
+    console.error("Erreur getAllAdmins:", err);
+    res.status(500).json({ message: "Erreur serveur." });
+  }
+};
+
+
+// GET /api/admin/others
 exports.getOtherAdmins = async (req, res) => {
   try {
     const admins = await Admin.find({ _id: { $ne: req.admin.id } }).select("-password");
@@ -168,7 +182,7 @@ exports.logoutAdmin = (req, res) => {
   res.clearCookie("adminToken", {
     httpOnly: true,
     secure: isProd,
-    sameSite: isProd ? "None" : "Lax",
+   sameSite: isProd ? "strict" : "lax",
   });
 
   res.status(200).json({ message: "Déconnecté avec succès." });

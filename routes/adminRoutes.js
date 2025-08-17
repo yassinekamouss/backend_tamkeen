@@ -4,8 +4,9 @@ const router = express.Router();
 const {
   loginAdmin,
   registerAdmin,
-  getOtherAdmins,
+  getAllAdmins,
   deleteAdmin,
+  getOtherAdmins,
   updateAdmin,
   getAdminProfile, 
   logoutAdmin,
@@ -18,9 +19,10 @@ router.post("/login", loginAdmin);
 router.post("/logout", logoutAdmin);
 
 // Protected
-router.get("/", authAdmin, authorizeRole("Administrateur"), getOtherAdmins);
+router.get("/", authAdmin, authorizeRole("Administrateur"), getAllAdmins);
 router.post("/register",authAdmin,authorizeRole("Administrateur"), registerAdmin);
 router.get("/me", authAdmin,getAdminProfile);
+router.get("/others", authAdmin, authorizeRole("Administrateur"), getOtherAdmins);
 router.delete("/:id", authAdmin ,authorizeRole("Administrateur"), deleteAdmin);
 router.put("/:id", authAdmin ,authorizeRole("Administrateur"), updateAdmin);
 
