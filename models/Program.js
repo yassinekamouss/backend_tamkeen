@@ -16,17 +16,28 @@ const programSchema = new mongoose.Schema(
       subtitleFr: { type: String, default: "" },
       subtitleAr: { type: String, default: "" },
       descriptionFr: { type: String, default: "" },
-      descriptionAr: { type: String, default: "" }
+      descriptionAr: { type: String, default: "" },
     },
     criteres: {
       secteurActivite: [String],
       statutJuridique: [String],
       applicantType: [String],
       montantInvestissement: [String],
+      // Ancienne configuration (global) conservée pour compatibilité rétroactive
       chiffreAffaire: {
         chiffreAffaireMin: { type: Number, default: null },
         chiffreAffaireMax: { type: Number, default: null },
       },
+      // Nouvelle configuration: chiffre d'affaires par secteur
+      // Exemple: [{ secteur: 'industrie', min: 100000, max: 5000000 }]
+      chiffreAffaireParSecteur: [
+        {
+          secteur: { type: String, required: true },
+          min: { type: Number, default: null },
+          max: { type: Number, default: null },
+          _id: false,
+        },
+      ],
       age: {
         minAge: { type: Number, default: null },
         maxAge: { type: Number, default: null },
