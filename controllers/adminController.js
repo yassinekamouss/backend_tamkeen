@@ -128,13 +128,12 @@ exports.loginAdmin = async (req, res) => {
 };
 
 
-// GET /api/admin/
-exports.getAllAdmins = async (req, res) => {
+exports.getOtherAdmins = async (req, res) => {
   try {
-    const admins = await Admin.find().select("-password"); // Exclure le mdp
+    const admins = await Admin.find({ _id: { $ne: req.admin.id } }).select("-password");
     res.status(200).json(admins);
   } catch (err) {
-    console.error("Erreur getAllAdmins:", err);
+    console.error("Erreur getOtherAdmins:", err);
     res.status(500).json({ message: "Erreur serveur." });
   }
 };
