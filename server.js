@@ -75,6 +75,7 @@ const io = new Server(server, {
       process.env.FRONTEND_ORIGIN.split(",")) || ["http://localhost:5173"],
     credentials: true,
   },
+  transports: ['websocket', 'polling']
 });
 
 // Socket auth for admins
