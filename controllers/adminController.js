@@ -2,6 +2,7 @@
 const Admin = require("../models/Admin");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const crypto = require("crypto");
 
 // POST /api/admin/register
 exports.registerAdmin = async (req, res) => {
@@ -106,7 +107,7 @@ exports.loginAdmin = async (req, res) => {
     res.cookie("adminToken", token, {
       httpOnly: true,
       secure: isProd, // HTTPS seulement en prod
-      sameSite: isProd ? "strict" : "lax",
+      sameSite: isProd ? "None" : "Lax",
       maxAge: 24 * 60 * 60 * 1000 // 1 jour
     });
 
@@ -182,7 +183,7 @@ exports.logoutAdmin = (req, res) => {
   res.clearCookie("adminToken", {
     httpOnly: true,
     secure: isProd,
-   sameSite: isProd ? "strict" : "lax",
+  sameSite: isProd ? "None" : "Lax",
   });
 
   res.status(200).json({ message: "Déconnecté avec succès." });
@@ -204,5 +205,40 @@ exports.getAdminProfile = async (req, res) => {
   } catch (error) {
     console.error("Erreur getAdminProfile:", error);
     res.status(500).json({ message: "Erreur serveur" });
+  }
+};
+
+
+// POST /api/admin/:id/reset-password
+exports.resetPassword = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    // Vérifier si l'admin existe
+    const admin = await Admin.findById(id);
+    if (!admin) {
+      return res.status(404).json({ message: "Admin non trouvé." });
+    }
+
+    const newPassword = crypto.randomBytes(6).toString("hex");
+
+    // Hacher le nouveau mot de passe
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    // Mettre à jour l'admin
+    admin.password = hashedPassword;
+    await admin.save();
+
+    // Envoyer le nouveau mot de passe par email
+    await sendEmail(
+      admin.email,
+      "Réinitialisation de votre mot de passe",
+      `Bonjour ${admin.username || ""},\n\nVotre nouveau mot de passe est : ${newPassword}\n\nVeuillez le changer après connexion.`
+    );
+
+    res.status(200).json({ message: "Mot de passe réinitialisé et envoyé par email." });
+  } catch (err) {
+    console.error("Erreur resetPassword:", err);
+    res.status(500).json({ message: "Erreur serveur." });
   }
 };
