@@ -30,8 +30,6 @@ app.get("/", (req, res) => {
   );
 });
 
-
-
 // Import routes
 const testRoutes = require("./routes/testRoutes");
 const adminRoutes = require("./routes/adminRoutes");
@@ -40,6 +38,7 @@ const userRoutes = require("./routes/userRoutes");
 const chatRoutes = require("./routes/chatRoutes");
 const statsRoutes = require("./routes/statsRoutes");
 const newsRoutes = require("./routes/newsRoutes");
+const activityRoutes = require("./routes/activityRoutes");
 
 // Health check
 app.get("/api/health", (req, res) => {
@@ -56,6 +55,8 @@ app.use("/api/stats", statsRoutes);
 app.use("/api/news", newsRoutes);
 // Supporter aussi les routes admin attendues par le frontend (/api/admin/news)
 app.use("/api/admin/news", newsRoutes);
+// Admin activity feed
+app.use("/api/admin/activity", activityRoutes);
 
 // Test Sentry
 app.get("/debug-sentry", (req, res) => {
@@ -75,13 +76,13 @@ const io = new Server(server, {
       process.env.FRONTEND_ORIGIN.split(",")) || ["http://localhost:5173"],
     credentials: true,
   },
-  transports: ['websocket', 'polling']
+  transports: ["websocket", "polling"],
 });
 
 // Socket auth for admins
 io.use(async (socket, next) => {
   try {
-   const cookies = socket.handshake.headers.cookie
+    const cookies = socket.handshake.headers.cookie
       ? cookie.parse(socket.handshake.headers.cookie)
       : {};
 

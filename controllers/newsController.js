@@ -1,5 +1,6 @@
 const asyncHandler = require("../utils/asyncHandler");
 const News = require("../models/News");
+const { logActivity } = require("../utils/activity");
 
 // GET - Obtenir toutes les actualités avec filtres et pagination (MongoDB)
 exports.getAllNews = asyncHandler(async (req, res) => {
@@ -88,13 +89,22 @@ exports.createNews = asyncHandler(async (req, res) => {
     publishedAt: publishedAt ? new Date(publishedAt) : new Date(),
   });
 
-  res
-    .status(201)
-    .json({
-      success: true,
-      data: created,
-      message: "Actualité créée avec succès",
+  res.status(201).json({
+    success: true,
+    data: created,
+    message: "Actualité créée avec succès",
+  });
+  // Log activity (best effort)
+  try {
+    await logActivity(req, {
+      type: "news_created",
+      title: "Actualité créée",
+      message: created.title,
+      entity: { kind: "news", id: String(created._id) },
+      meta: { category: created.category },
+      actor: req.admin || null,
     });
+  } catch {}
 });
 
 // PUT - Mettre à jour une actualité (Admin)
@@ -123,6 +133,16 @@ exports.updateNews = asyncHandler(async (req, res) => {
     data: updated,
     message: "Actualité mise à jour avec succès",
   });
+  try {
+    await logActivity(req, {
+      type: "news_updated",
+      title: "Actualité mise à jour",
+      message: updated.title,
+      entity: { kind: "news", id: String(updated._id) },
+      meta: { category: updated.category },
+      actor: req.admin || null,
+    });
+  } catch {}
 });
 
 // DELETE - Supprimer une actualité (Admin)
@@ -144,4 +164,14 @@ exports.deleteNews = asyncHandler(async (req, res) => {
     data: deleted,
     message: "Actualité supprimée avec succès",
   });
+  try {
+    await logActivity(req, {
+      type: "news_deleted",
+      title: "Actualité supprimée",
+      message: deleted.title,
+      entity: { kind: "news", id: String(deleted._id) },
+      meta: { category: deleted.category },
+      actor: req.admin || null,
+    });
+  } catch {}
 });

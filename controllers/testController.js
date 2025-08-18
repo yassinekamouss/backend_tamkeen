@@ -5,6 +5,7 @@ const getPrograms = require("../utils/eligibilityHelpers");
 const asyncHandler = require("../utils/asyncHandler");
 const api = require("../utils/apiResponse");
 const sendEmail = require("../utils/email");
+const { logActivity } = require("../utils/activity");
 
 exports.verifierElegibilite = asyncHandler(async (req, res) => {
   try {
@@ -106,6 +107,37 @@ exports.verifierElegibilite = asyncHandler(async (req, res) => {
       }
     } catch (e) {
       console.warn("Socket emit failed:", e?.message || e);
+    }
+
+    // Logger l'activité unifiée
+    try {
+      const applicantName =
+        personne.applicantType === "morale"
+          ? personne.nomEntreprise
+          : `${personne.nom || ""} ${personne.prenom || ""}`.trim();
+      await logActivity(req, {
+        type: "test_submitted",
+        title: "Nouveau test d'éligibilité",
+        message: `${applicantName || "Utilisateur"} • ${created.region} • ${
+          eligibleProgramNamesAndLinks.length
+            ? `${eligibleProgramNamesAndLinks.length} programme(s) éligible(s)`
+            : "Aucun programme éligible"
+        }`,
+        entity: { kind: "test", id: String(created._id) },
+        meta: {
+          region: created.region,
+          eligible: eligibleProgramNamesAndLinks.length > 0,
+          applicant: {
+            id: String(personne._id),
+            type: personne.applicantType,
+            name: applicantName,
+            email: personne.email,
+          },
+        },
+        actor: null,
+      });
+    } catch (e) {
+      console.warn("Activity log failed (test_submitted):", e?.message || e);
     }
 
     if (eligibleProgramNamesAndLinks.length > 0) {

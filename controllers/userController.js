@@ -4,6 +4,7 @@ const asyncHandler = require("../utils/asyncHandler");
 const api = require("../utils/apiResponse");
 const Admin = require("../models/Admin");
 const ExcelJS = require("exceljs");
+const { logActivity } = require("../utils/activity");
 
 // Obtenir toutes les personnes
 exports.getAllUsers = asyncHandler(async (req, res) => {
@@ -241,6 +242,37 @@ exports.updateUser = asyncHandler(async (req, res) => {
     } catch (emitErr) {
       // Ne pas bloquer la réponse HTTP si l'émission échoue
       console.error("Socket emit error (user:updated):", emitErr);
+    }
+
+    // Log activité unifiée si l'état a changé
+    try {
+      if (previous && previous.etat !== updated.etat) {
+        const name =
+          updated.applicantType === "morale"
+            ? updated.nomEntreprise
+            : `${updated.prenom || ""} ${updated.nom || ""}`.trim();
+        await logActivity(req, {
+          type: "user_updated",
+          title: "Utilisateur mis à jour",
+          message: `${name || "Utilisateur"} • état: ${previous.etat} → ${
+            updated.etat
+          }`,
+          entity: { kind: "user", id: String(updated._id) },
+          meta: {
+            from: previous.etat,
+            to: updated.etat,
+            consultantAssocie: updated.consultantAssocie
+              ? {
+                  _id: String(updated.consultantAssocie._id),
+                  username: updated.consultantAssocie.username,
+                }
+              : null,
+          },
+          actor: req.admin || null,
+        });
+      }
+    } catch (e) {
+      console.warn("Activity log failed (user_updated):", e?.message || e);
     }
 
     res.status(200).json(updated);

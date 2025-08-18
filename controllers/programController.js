@@ -2,11 +2,23 @@ const Program = require("../models/Program");
 const mongoose = require("mongoose");
 const asyncHandler = require("../utils/asyncHandler");
 const api = require("../utils/apiResponse");
+const { logActivity } = require("../utils/activity");
 
 // Créer un programme
 exports.createProgram = asyncHandler(async (req, res) => {
   const newProgram = new Program(req.body);
   const savedProgram = await newProgram.save();
+  // Log activity
+  try {
+    await logActivity(req, {
+      type: "program_created",
+      title: "Programme créé",
+      message: savedProgram.name || "Programme",
+      entity: { kind: "program", id: String(savedProgram._id) },
+      meta: {},
+      actor: req.admin || null,
+    });
+  } catch {}
   return api.created(res, { program: savedProgram });
 });
 
@@ -43,6 +55,16 @@ exports.updateProgram = asyncHandler(async (req, res) => {
   if (!updatedProgram) {
     return api.error(res, "Programme non trouvé", 404);
   }
+  try {
+    await logActivity(req, {
+      type: "program_updated",
+      title: "Programme mis à jour",
+      message: updatedProgram.name || "Programme",
+      entity: { kind: "program", id: String(updatedProgram._id) },
+      meta: {},
+      actor: req.admin || null,
+    });
+  } catch {}
   return api.ok(res, { program: updatedProgram });
 });
 
@@ -56,6 +78,16 @@ exports.deleteProgram = asyncHandler(async (req, res) => {
   if (!deletedProgram) {
     return api.error(res, "Programme non trouvé", 404);
   }
+  try {
+    await logActivity(req, {
+      type: "program_deleted",
+      title: "Programme supprimé",
+      message: deletedProgram.name || "Programme",
+      entity: { kind: "program", id: String(deletedProgram._id) },
+      meta: {},
+      actor: req.admin || null,
+    });
+  } catch {}
   return api.ok(res, { message: "Programme supprimé avec succès" });
 });
 
@@ -71,21 +103,30 @@ exports.toggleProgramActive = asyncHandler(async (req, res) => {
   }
   program.isActive = !program.isActive;
   await program.save();
+  try {
+    await logActivity(req, {
+      type: "program_toggled",
+      title: program.isActive ? "Programme activé" : "Programme désactivé",
+      message: program.name || "Programme",
+      entity: { kind: "program", id: String(program._id) },
+      meta: { isActive: program.isActive },
+      actor: req.admin || null,
+    });
+  } catch {}
   return api.ok(res, {
     message: `Programme ${program.isActive ? "activé" : "désactivé"}`,
     program,
   });
 });
 
-
 // Mettre à jour les données hero d'un programme
 exports.updateProgramHero = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  
+
   if (!mongoose.Types.ObjectId.isValid(id)) {
     return api.error(res, "ID invalide", 400);
   }
-  
+
   const program = await Program.findById(id);
   if (!program) {
     return api.error(res, "Programme non trouvé", 404);
@@ -101,7 +142,7 @@ exports.updateProgramHero = asyncHandler(async (req, res) => {
       subtitleFr: "",
       subtitleAr: "",
       descriptionFr: "",
-      descriptionAr: ""
+      descriptionAr: "",
     };
   } else {
     // Si on active isHero, on met à jour avec les données fournies
@@ -113,25 +154,26 @@ exports.updateProgramHero = asyncHandler(async (req, res) => {
       subtitleFr: req.body.subtitleFr || "",
       subtitleAr: req.body.subtitleAr || "",
       descriptionFr: req.body.descriptionFr || "",
-      descriptionAr: req.body.descriptionAr || ""
+      descriptionAr: req.body.descriptionAr || "",
     };
   }
 
   await program.save();
 
   return api.ok(res, {
-    message: program.hero.isHero ? "Programme publié avec succès" : "Programme dépublié avec succès",
-    program
+    message: program.hero.isHero
+      ? "Programme publié avec succès"
+      : "Programme dépublié avec succès",
+    program,
   });
 });
 
-
 // Obtenir les programmes publiés (hero)
 exports.getHeroPrograms = asyncHandler(async (req, res) => {
-  const heroPrograms = await Program.find({ 
+  const heroPrograms = await Program.find({
     "hero.isHero": true,
-    isActive: true 
-  }).select('hero');
-  
+    isActive: true,
+  }).select("hero");
+
   return res.status(200).json(heroPrograms);
 });
