@@ -7,8 +7,10 @@ const ExcelJS = require("exceljs");
 
 // Obtenir toutes les personnes
 exports.getAllUsers = asyncHandler(async (req, res) => {
-  const personnes = await Personne.find()
-    .populate("consultantAssocie", "username");
+  const personnes = await Personne.find().populate(
+    "consultantAssocie",
+    "username"
+  );
 
   return res.status(200).json(personnes);
 });
@@ -45,7 +47,6 @@ exports.exportUsers = asyncHandler(async (req, res) => {
 
     // Charger les tests liés avec le filtre date
     const tests = await TestElegibilite.find(testFilter).lean();
-
 
     // Associer chaque test à sa personne
     const testsMap = {};
@@ -91,7 +92,9 @@ exports.exportUsers = asyncHandler(async (req, res) => {
 
     // Remplir les données : UNE LIGNE PAR TEST
     tests.forEach((test) => {
-      const personne = personnes.find((p) => p._id.toString() === test.personne.toString());
+      const personne = personnes.find(
+        (p) => p._id.toString() === test.personne.toString()
+      );
       if (!personne) return; // sécurité
 
       worksheet.addRow({
@@ -142,11 +145,8 @@ exports.exportUsers = asyncHandler(async (req, res) => {
             fgColor: { argb: isEvenRow ? "FFF2F2F2" : "FFFFFFFF" }, // deux tons de gris clair pour alterner
           };
         }
-
       });
     });
-
-
 
     // Fonctions utilitaires
     function formatChiffreAffaires(ca) {
@@ -164,10 +164,7 @@ exports.exportUsers = asyncHandler(async (req, res) => {
       "Content-Type",
       "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     );
-    res.setHeader(
-      "Content-Disposition",
-      "attachment; filename=Clients.xlsx"
-    );
+    res.setHeader("Content-Disposition", "attachment; filename=Clients.xlsx");
 
     await workbook.xlsx.write(res);
     res.end();
@@ -176,7 +173,6 @@ exports.exportUsers = asyncHandler(async (req, res) => {
     res.status(500).json({ message: "Erreur lors de l'export Excel." });
   }
 });
-
 
 // Obtenir une personne par ID
 exports.getUserById = asyncHandler(async (req, res) => {
@@ -191,13 +187,20 @@ exports.getUserById = asyncHandler(async (req, res) => {
 // Mettre à jour une personne
 exports.updateUser = asyncHandler(async (req, res) => {
   try {
-    const { consultantAssocie, ...rest } = req.body; // consultantAssocie = ID de l'admin envoyé par le frontend
+    const { consultantAssocie, ...rest } = req.body; // consultantAssocie peut être un ID ou un objet {_id, username}
+    const consultantAssocieId =
+      consultantAssocie && typeof consultantAssocie === "object"
+        ? consultantAssocie._id
+        : consultantAssocie;
 
     // Vérifier si l'admin existe
-    const admin = await Admin.findById(consultantAssocie);
+    const admin = await Admin.findById(consultantAssocieId);
     if (!admin) {
       return res.status(404).json({ message: "Consultant (Admin) non trouvé" });
     }
+
+    // Garder l'ancien état pour détecter un changement d'état
+    const previous = await Personne.findById(req.params.id).select("etat");
 
     // Mettre à jour la personne avec l'état + référence de l'admin
     const updated = await Personne.findByIdAndUpdate(
@@ -213,10 +216,39 @@ exports.updateUser = asyncHandler(async (req, res) => {
       return res.status(404).json({ message: "Personne non trouvée" });
     }
 
+    // Émettre un événement temps réel aux admins si l'état a changé
+    try {
+      const io = req.app.get("io");
+      if (io && previous && previous.etat !== updated.etat) {
+        io.to("admins").emit("user:updated", {
+          _id: updated._id,
+          etat: updated.etat,
+          consultantAssocie: updated.consultantAssocie
+            ? {
+                _id: String(updated.consultantAssocie._id),
+                username: updated.consultantAssocie.username,
+              }
+            : null,
+          applicantType: updated.applicantType,
+          nom: updated.nom,
+          prenom: updated.prenom,
+          nomEntreprise: updated.nomEntreprise,
+          email: updated.email,
+          telephone: updated.telephone,
+          createdAt: updated.createdAt,
+        });
+      }
+    } catch (emitErr) {
+      // Ne pas bloquer la réponse HTTP si l'émission échoue
+      console.error("Socket emit error (user:updated):", emitErr);
+    }
+
     res.status(200).json(updated);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Erreur lors de la mise à jour de l'utilisateur" });
+    res
+      .status(500)
+      .json({ message: "Erreur lors de la mise à jour de l'utilisateur" });
   }
 });
 
