@@ -39,6 +39,7 @@ const chatRoutes = require("./routes/chatRoutes");
 const statsRoutes = require("./routes/statsRoutes");
 const newsRoutes = require("./routes/newsRoutes");
 const activityRoutes = require("./routes/activityRoutes");
+const partenairesRoutes = require("./routes/partenairesRoutes");
 
 // Health check
 app.get("/api/health", (req, res) => {
@@ -53,6 +54,8 @@ app.use("/api/users", userRoutes);
 app.use("/api/chat", chatRoutes);
 app.use("/api/stats", statsRoutes);
 app.use("/api/news", newsRoutes);
+app.use("/api/partenaires", partenairesRoutes);
+
 // Supporter aussi les routes admin attendues par le frontend (/api/admin/news)
 app.use("/api/admin/news", newsRoutes);
 // Admin activity feed
