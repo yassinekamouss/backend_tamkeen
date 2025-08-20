@@ -40,36 +40,43 @@ const criteresCheckers = {
   // valeursCriteres: Array<{ secteur: string, min: number|null, max: number|null }>
   // Si tableau vide -> pas de restriction. Si entrée correspondante trouvée -> applique min/max.
   // Si aucune entrée trouvée pour le secteur de l'utilisateur -> on considère "pas de restriction" pour éviter de bloquer.
-  chiffreAffaireParSecteur: (valeursCriteres = [], formData) => {
-    if (!Array.isArray(valeursCriteres) || valeursCriteres.length === 0)
-      return true;
+chiffreAffaireParSecteur: (valeursCriteres = [], formData, globalCA = {}) => {
+  // Si aucun critère par secteur -> fallback sur global
+  if (!Array.isArray(valeursCriteres) || valeursCriteres.length === 0) {
+    return criteresCheckers.chiffreAffaire(globalCA, formData);
+  }
 
-    const secteur = formData.secteurTravail;
-    if (!secteur) return true; // pas d'info secteur -> ne pas bloquer ici (le critère secteurActivite gère déjà)
+  const secteur = formData.secteurTravail;
+  if (!secteur) return true; // pas de secteur fourni → critère secteurActivite gère déjà
 
-    const cfg = valeursCriteres.find((v) => v && v.secteur === secteur);
-    if (!cfg) return true;
+  const cfg = valeursCriteres.find((v) => v && v.secteur === secteur);
 
-    const { min: chiffreAffaireMin = null, max: chiffreAffaireMax = null } =
-      cfg;
+  // Si le secteur n’a pas de règle définie -> fallback sur global
+  if (!cfg) {
+    return criteresCheckers.chiffreAffaire(globalCA, formData);
+  }
 
-    const shouldSkip = chiffreAffaireMin == null && chiffreAffaireMax == null;
-    if (shouldSkip) return true;
+  const { min: chiffreAffaireMin = null, max: chiffreAffaireMax = null } = cfg;
 
-    const valeurs = [
-      parseFloat(formData.chiffreAffaire2022),
-      parseFloat(formData.chiffreAffaire2023),
-      parseFloat(formData.chiffreAffaire2024),
-    ].filter((v) => !isNaN(v));
+  // Si la règle spécifique est vide -> fallback sur global
+  if (chiffreAffaireMin == null && chiffreAffaireMax == null) {
+    return criteresCheckers.chiffreAffaire(globalCA, formData);
+  }
 
-    if (!valeurs.length) return false;
+  const valeurs = [
+    parseFloat(formData.chiffreAffaire2022),
+    parseFloat(formData.chiffreAffaire2023),
+    parseFloat(formData.chiffreAffaire2024),
+  ].filter((v) => !isNaN(v));
 
-    const maxCA = Math.max(...valeurs);
-    return (
-      (chiffreAffaireMin == null || maxCA >= chiffreAffaireMin) &&
-      (chiffreAffaireMax == null || maxCA <= chiffreAffaireMax)
-    );
-  },
+  if (!valeurs.length) return false;
+
+  const maxCA = Math.max(...valeurs);
+  return (
+    (chiffreAffaireMin == null || maxCA >= chiffreAffaireMin) &&
+    (chiffreAffaireMax == null || maxCA <= chiffreAffaireMax)
+  );
+},
 
   age: ({ minAge, maxAge } = {}, formData) => {
     const shouldSkip =

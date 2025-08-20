@@ -7,25 +7,27 @@ function getPrograms(programs, formData) {
     const criteres = program.criteres;
     let isEligible = true;
 
-    // Gestion de priorité: si chiffreAffaireParSecteur est défini et non vide, ignorer le champ global chiffreAffaire
-    const hasPerSectorCA =
-      Array.isArray(criteres.chiffreAffaireParSecteur) &&
-      criteres.chiffreAffaireParSecteur.length > 0;
+   
+  for (const critere in criteres) {
+    if (critere === "chiffreAffaire") continue;
+  const valeur = criteres[critere];
+  const checker = criteresCheckers[critere];
 
-    for (const critere in criteres) {
-      // Skip global CA if per-sector is provided
-      if (hasPerSectorCA && critere === "chiffreAffaire") continue;
-
-      const valeur = criteres[critere];
-      const checker = criteresCheckers[critere];
-      if (checker) {
-        const result = checker(valeur, formData);
-        if (!result) {
-          isEligible = false;
-          break;
-        }
-      }
+  if (checker) {
+    let result;
+    if (critere === "chiffreAffaireParSecteur") {
+      result = checker(valeur, formData, criteres.chiffreAffaire);
+    } else {
+      result = checker(valeur, formData);
     }
+
+    if (!result) {
+      isEligible = false;
+      break;
+    }
+  }
+}
+
 
     if (isEligible) {
       eligiblePrograms.push({
