@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const { chiffreAffaire } = require("../utils/eligibilityCheckers");
 const programSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
