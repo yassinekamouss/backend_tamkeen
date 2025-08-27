@@ -56,6 +56,12 @@ app.use("/api/stats", statsRoutes);
 app.use("/api/news", newsRoutes);
 app.use("/api/partenaires", partenairesRoutes);
 
+
+app.get("/debug-env", (req, res) => {
+  res.json({ NODE_ENV: process.env.NODE_ENV });
+});
+
+
 // Supporter aussi les routes admin attendues par le frontend (/api/admin/news)
 app.use("/api/admin/news", newsRoutes);
 // Admin activity feed
