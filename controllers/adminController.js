@@ -107,7 +107,7 @@ exports.loginAdmin = async (req, res) => {
   const isProd = process.env.NODE_ENV === "production";
     res.cookie("adminToken", token, {
       httpOnly: true,
-      secure: true, // HTTPS seulement en prod
+      secure: isProd, // HTTPS seulement en prod
       sameSite:"None",
       maxAge: 24 * 60 * 60 * 1000 ,// 1 jour
        domain: isProd ? ".herokuapp.com" : undefined,
@@ -184,8 +184,9 @@ exports.logoutAdmin = (req, res) => {
 
   res.clearCookie("adminToken", {
     httpOnly: true,
-    secure: true,
+    secure: isProd,
   sameSite: "None",
+  domain: isProd ? ".herokuapp.com" : undefined,
   });
 
   res.status(200).json({ message: "Déconnecté avec succès." });
