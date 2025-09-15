@@ -40,9 +40,12 @@ exports.exportUsers = asyncHandler(async (req, res) => {
 
     // Si on a reçu un domaine de date (intervalle)
     if (startDate && endDate) {
+      const end = new Date(endDate);
+      end.setDate(end.getDate() + 1);
+
       testFilter.createdAt = {
         $gte: new Date(startDate),
-        $lte: new Date(endDate),
+        $lt: end,
       };
     }
 
@@ -64,6 +67,8 @@ exports.exportUsers = asyncHandler(async (req, res) => {
       { header: "prenom", key: "prenom", width: 20 },
       { header: "nom", key: "nom", width: 25 },
       { header: "nom_entreprise", key: "nom_entreprise", width: 30 },
+      { header: "email", key: "email", width: 30 },
+      { header: "programmesEligibles", key: "programmesEligibles", width: 30 },
       { header: "type", key: "type", width: 25 },
       { header: "telephone", key: "telephone", width: 20 },
       { header: "zone", key: "zone", width: 25 },
@@ -71,7 +76,8 @@ exports.exportUsers = asyncHandler(async (req, res) => {
       { header: "secteur_activite", key: "secteur_activite", width: 30 },
       { header: "annee_creation", key: "annee_creation", width: 15 },
       { header: "chiffre_affaires", key: "chiffre_affaires", width: 25 },
-      { header: "est_eligible", key: "est_eligible", width: 15 },
+      // { header: "est_eligible", key: "est_eligible", width: 15 },
+      { header: "date_du_test", key: "date_du_test", width: 20 },
     ];
 
     // Style des en-têtes
@@ -102,6 +108,10 @@ exports.exportUsers = asyncHandler(async (req, res) => {
         prenom: personne.prenom || "N/A",
         nom: personne.nom || "N/A",
         nom_entreprise: personne.nomEntreprise || "N/A",
+        email: personne.email || "N/A",
+        programmesEligibles: test.programmesEligibles
+          ? test.programmesEligibles.join(", ")
+          : "N/A",
         type: personne.applicantType || "N/A",
         telephone: personne.telephone || "N/A",
         zone: test.region || "N/A",
@@ -111,7 +121,10 @@ exports.exportUsers = asyncHandler(async (req, res) => {
         chiffre_affaires: test.chiffreAffaires
           ? formatChiffreAffaires(test.chiffreAffaires)
           : "N/A",
-        est_eligible: test.programmesEligibles?.length > 0 ? 1 : 0,
+        // est_eligible: test.programmesEligibles?.length > 0 ? 1 : 0,
+        date_du_test: test.createdAt
+          ? new Date(test.createdAt).toLocaleDateString("fr-FR")
+          : "N/A",
       });
     });
 
@@ -226,9 +239,9 @@ exports.updateUser = asyncHandler(async (req, res) => {
           etat: updated.etat,
           consultantAssocie: updated.consultantAssocie
             ? {
-                _id: String(updated.consultantAssocie._id),
-                username: updated.consultantAssocie.username,
-              }
+              _id: String(updated.consultantAssocie._id),
+              username: updated.consultantAssocie.username,
+            }
             : null,
           applicantType: updated.applicantType,
           nom: updated.nom,
@@ -254,18 +267,17 @@ exports.updateUser = asyncHandler(async (req, res) => {
         await logActivity(req, {
           type: "user_updated",
           title: "Utilisateur mis à jour",
-          message: `${name || "Utilisateur"} • état: ${previous.etat} → ${
-            updated.etat
-          }`,
+          message: `${name || "Utilisateur"} • état: ${previous.etat} → ${updated.etat
+            }`,
           entity: { kind: "user", id: String(updated._id) },
           meta: {
             from: previous.etat,
             to: updated.etat,
             consultantAssocie: updated.consultantAssocie
               ? {
-                  _id: String(updated.consultantAssocie._id),
-                  username: updated.consultantAssocie.username,
-                }
+                _id: String(updated.consultantAssocie._id),
+                username: updated.consultantAssocie.username,
+              }
               : null,
           },
           actor: req.admin || null,
