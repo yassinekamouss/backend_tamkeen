@@ -168,12 +168,6 @@ exports.verifierElegibilite = asyncHandler(async (req, res) => {
       // Email si éligible
       const emailEligible = `
   <div style="font-family:Arial,sans-serif;line-height:1.5;">
-    <div style="text-align:center;margin-bottom:20px;">
-      <img src="${process.env.FRONTEND_ORIGIN}/logo.webp"
-           alt="Tamkeen Center"
-           width="150"
-           style="display:block;margin:0 auto;" />
-    </div>
     <h2 style="color:#4CAF50;">Résultat de votre test d’éligibilité</h2>
     <p>Bonjour,</p>
     <p>Nous avons le plaisir de vous informer que vous êtes 
@@ -204,7 +198,14 @@ exports.verifierElegibilite = asyncHandler(async (req, res) => {
 
      <p>Nous restons à votre disposition pour tout complément d’information.</p>
 
-    <p>Bien cordialement</p>
+     <div style="text-align:center;margin-top:30px;">
+      <p style="margin-bottom:10px;">Bien cordialement,<br>
+      <strong>L’équipe Tamkeen</strong></p>
+      <img src="${process.env.FRONTEND_ORIGIN}/tamkeen.png"
+           alt="Tamkeen Center"
+           width="150"
+           style="display:block;margin:0 auto;" />
+    </div>
   </div>
 `;
 
@@ -212,12 +213,7 @@ exports.verifierElegibilite = asyncHandler(async (req, res) => {
       //  Email si NON éligible
      const emailNonEligible = `
   <div style="font-family:Arial,sans-serif;line-height:1.5;">
-    <div style="text-align:center;margin-bottom:20px;">
-      <img src="${process.env.FRONTEND_ORIGIN}/logo.webp"
-           alt="Tamkeen Center"
-           width="150"
-           style="display:block;margin:0 auto;" />
-    </div>
+   
     <h2 style="color:#E53935;">Résultat de votre test d’éligibilité</h2>
     <p>Bonjour,</p>
     <p>Suite à votre test d’éligibilité, nous vous informons que vous ne répondez pas actuellement 
@@ -241,7 +237,14 @@ exports.verifierElegibilite = asyncHandler(async (req, res) => {
 
       <p>N’hésitez pas à nous contacter pour toute question ou besoin d’accompagnement.</p>
 
-    <p>Bien cordialement</p>
+     <div style="text-align:center;margin-top:30px;">
+      <p style="margin-bottom:10px;">Bien cordialement,<br>
+      <strong>L’équipe Tamkeen</strong></p>
+      <img src="${process.env.FRONTEND_ORIGIN}/tamkeen.png"
+           alt="Tamkeen Center"
+           width="150"
+           style="display:block;margin:0 auto;" />
+    </div>
   </div>
 `;
 
