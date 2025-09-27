@@ -198,6 +198,12 @@ exports.getUserById = asyncHandler(async (req, res) => {
   return res.status(200).json(personne);
 });
 
+
+exports.getUserByconsultant = asyncHandler(async (req, res) => {
+  const personnes = await Personne.find({ consultantAssocie: req.params.id });
+  return res.status(200).json(personnes);
+});
+
 // Mettre à jour une personne
 exports.updateUser = asyncHandler(async (req, res) => {
   try {
