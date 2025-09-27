@@ -197,14 +197,16 @@ exports.verifierElegibilite = asyncHandler(async (req, res) => {
      afin de faciliter la suite du processus.</p>
 
      <p>Nous restons à votre disposition pour tout complément d’information.</p>
+    
+     <p style="margin-top:25px;">Bien cordialement,</p>
 
-     <div style="text-align:center;margin-top:30px;">
-      <p style="margin-bottom:10px;">Bien cordialement,<br>
-      <strong>L’équipe Tamkeen</strong></p>
+    <!--  Signature au centre -->
+    <div style="text-align:center;margin-top:20px;">
       <img src="${process.env.FRONTEND_ORIGIN}/tamkeen.png"
            alt="Tamkeen Center"
            width="150"
-           style="display:block;margin:0 auto;" />
+           style="display:block;margin:0 auto 10px auto;" />
+      <p style="font-weight:bold;font-size:16px;margin:0;">L’équipe Tamkeen</p>
     </div>
   </div>
 `;
@@ -238,12 +240,15 @@ exports.verifierElegibilite = asyncHandler(async (req, res) => {
       <p>N’hésitez pas à nous contacter pour toute question ou besoin d’accompagnement.</p>
 
      <div style="text-align:center;margin-top:30px;">
-      <p style="margin-bottom:10px;">Bien cordialement,<br>
-      <strong>L’équipe Tamkeen</strong></p>
+     <p style="margin-top:25px;">Bien cordialement,</p>
+
+    <!--  Signature au centre -->
+    <div style="text-align:center;margin-top:20px;">
       <img src="${process.env.FRONTEND_ORIGIN}/tamkeen.png"
            alt="Tamkeen Center"
            width="150"
-           style="display:block;margin:0 auto;" />
+           style="display:block;margin:0 auto 10px auto;" />
+      <p style="font-weight:bold;font-size:16px;margin:0;">L’équipe Tamkeen</p>
     </div>
   </div>
 `;
