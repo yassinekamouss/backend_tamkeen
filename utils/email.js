@@ -12,18 +12,18 @@ const transporter = nodemailer.createTransport({
 });
 
 /**
- * Envoie un email simple
+ * Envoie un email HTML
  * @param {string} to Destinataire
  * @param {string} subject Sujet de l'email
- * @param {string} text Contenu en texte brut
+ * @param {string} html  Contenu HTML de l'email
  */
-async function sendEmail(to, subject, text) {
+async function sendEmail(to, subject, html) {
   try {
     await transporter.sendMail({
       from: process.env.FROM_EMAIL,
       to,
       subject,
-      text
+      html
     });
     console.log(`✅ Email envoyé à ${to}`);
   } catch (error) {

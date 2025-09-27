@@ -140,23 +140,123 @@ exports.verifierElegibilite = asyncHandler(async (req, res) => {
       console.warn("Activity log failed (test_submitted):", e?.message || e);
     }
 
-    if (eligibleProgramNamesAndLinks.length > 0) {
-      await sendEmail(
-        data.email,
-        "Résultat de votre test d'éligibilité",
-        "Félicitations ! Vous êtes éligible à certains programmes."
-      );
+      //  Gérer les noms en fonction du type
+      let blocNom;
+    if (personne.applicantType === "morale") {
+      blocNom = `<li><strong>Nom de l'entreprise :</strong> ${personne.nomEntreprise || "—"}</li>`;
     } else {
-      await sendEmail(
-        data.email,
-        "Résultat de votre test d'éligibilité",
-        "Nous sommes désolés, vous n'êtes éligible à aucun programme pour le moment."
-      );
+      blocNom = `
+        <li><strong>Nom :</strong> ${personne.nom || "—"}</li>
+        <li><strong>Prénom :</strong> ${personne.prenom || "—"}</li>
+      `;
     }
+
+      //  Affichage clair des chiffres d'affaires
+      let chiffresAffairesTxt = "";
+      const ca = created.chiffreAffaires || {};
+      if (ca.chiffreAffaire2022 || ca.chiffreAffaire2023 || ca.chiffreAffaire2024) {
+        chiffresAffairesTxt +=
+          `2022 : ${ca.chiffreAffaire2022 ?? "—"} DH\n` +
+          `2023 : ${ca.chiffreAffaire2023 ?? "—"} DH\n` +
+          `2024 : ${ca.chiffreAffaire2024 ?? "—"} DH`;
+      } else {
+        chiffresAffairesTxt = "Non renseigné";
+      }
+
+      const emailSubject = "Résultat de votre test d’éligibilité";
+
+      // Email si éligible
+      const emailEligible = `
+  <div style="font-family:Arial,sans-serif;line-height:1.5;">
+    <div style="text-align:center;margin-bottom:20px;">
+      <img src="${process.env.FRONTEND_URL}/logo.webp"
+           alt="Tamkeen Center"
+           width="150"
+           style="display:block;margin:0 auto;" />
+    </div>
+    <h2 style="color:#4CAF50;">Résultat de votre test d’éligibilité</h2>
+    <p>Bonjour,</p>
+    <p>Nous avons le plaisir de vous informer que vous êtes 
+       <strong style="color:#4CAF50;">éligible</strong> aux programmes de subvention proposés.</p>
+
+    <h3>Récapitulatif de vos données :</h3>
+    <ul>
+      ${blocNom}
+      <li><strong>Téléphone :</strong> ${personne.telephone || "—"}</li>
+      <li><strong>Email :</strong> ${personne.email || "—"}</li>
+      <li><strong>Ville :</strong> ${created.region || "—"}</li>
+      <li><strong>Statut Juridique :</strong> ${created.statutJuridique || "—"}</li>
+      <li><strong>Secteur d’activité :</strong> ${created.secteurTravail || "—"}</li>
+      <li><strong>Date de création :</strong> ${created.anneeCreation || "—"}</li>
+      <li><strong>Chiffres d'affaires :</strong><br>${chiffresAffairesTxt.replace(/\n/g, "<br>")}</li>
+      <li><strong>Montant d'investissement :</strong> ${created.montantInvestissement || "—"}</li>
+    </ul>
+
+    <p>Notre équipe prendra contact avec vous prochainement pour :</p>
+    <ul>
+      <li>vous présenter les programmes qui correspondent le mieux à votre profil,</li>
+      <li>vous accompagner dans les démarches à suivre pour bénéficier du soutien,</li>
+      <li>et répondre à toutes vos questions.</li>
+    </ul>
+
+    <p>En attendant, vous pouvez préparer les documents relatifs à votre projet/entreprise
+     afin de faciliter la suite du processus.</p>
+
+     <p>Nous restons à votre disposition pour tout complément d’information.</p>
+
+    <p>Bien cordialement</p>
+  </div>
+`;
+
+
+      //  Email si NON éligible
+     const emailNonEligible = `
+  <div style="font-family:Arial,sans-serif;line-height:1.5;">
+    <div style="text-align:center;margin-bottom:20px;">
+      <img src="${process.env.FRONTEND_URL}/logo.webp"
+           alt="Tamkeen Center"
+           width="150"
+           style="display:block;margin:0 auto;" />
+    </div>
+    <h2 style="color:#E53935;">Résultat de votre test d’éligibilité</h2>
+    <p>Bonjour,</p>
+    <p>Suite à votre test d’éligibilité, nous vous informons que vous ne répondez pas actuellement 
+       aux critères requis pour accéder aux programmes de subvention proposés.</p>
+
+    <h3>Récapitulatif de vos données :</h3>
+    <ul>
+      ${blocNom}
+      <li><strong>Téléphone :</strong> ${personne.telephone || "—"}</li>
+      <li><strong>Email :</strong> ${personne.email || "—"}</li>
+      <li><strong>Ville :</strong> ${created.region || "—"}</li>
+      <li><strong>Statut Juridique :</strong> ${created.statutJuridique || "—"}</li>
+      <li><strong>Secteur d’activité :</strong> ${created.secteurTravail || "—"}</li>
+      <li><strong>Date de création :</strong> ${created.anneeCreation || "—"}</li>
+      <li><strong>Chiffres d'affaires :</strong><br>${chiffresAffairesTxt.replace(/\n/g, "<br>")}</li>
+      <li><strong>Montant d'investissement :</strong> ${created.montantInvestissement || "—"}</li>
+    </ul>
+
+    <p>Cependant, d’autres solutions et dispositifs d’accompagnement peuvent être adaptés à votre profil.
+       Notre équipe reste à votre disposition pour vous orienter vers les alternatives les plus pertinentes.</p>
+
+      <p>N’hésitez pas à nous contacter pour toute question ou besoin d’accompagnement.</p>
+
+    <p>Bien cordialement</p>
+  </div>
+`;
+
+      //  Envoi
+      if (eligibleProgramNamesAndLinks.length > 0) {
+        await sendEmail(data.email, emailSubject, emailEligible);
+      } else {
+        await sendEmail(data.email, emailSubject, emailNonEligible);
+      }
+
+
 
     return api.created(res, { programs: eligibleProgramNamesAndLinks });
   } catch (err) {
-    // 🔹 Gestion spécifique des erreurs de clé dupliquée
+    //  Gestion spécifique des erreurs de clé dupliquée
     if (err.code === 11000) {
       if (err.keyPattern && err.keyPattern.telephone) {
         return api.error(
