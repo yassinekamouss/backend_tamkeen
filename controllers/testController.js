@@ -169,7 +169,7 @@ exports.verifierElegibilite = asyncHandler(async (req, res) => {
       const emailEligible = `
   <div style="font-family:Arial,sans-serif;line-height:1.5;">
     <div style="text-align:center;margin-bottom:20px;">
-      <img src="${process.env.FRONTEND_URL}/logo.webp"
+      <img src="${process.env.FRONTEND_ORIGIN}/logo.webp"
            alt="Tamkeen Center"
            width="150"
            style="display:block;margin:0 auto;" />
@@ -213,7 +213,7 @@ exports.verifierElegibilite = asyncHandler(async (req, res) => {
      const emailNonEligible = `
   <div style="font-family:Arial,sans-serif;line-height:1.5;">
     <div style="text-align:center;margin-bottom:20px;">
-      <img src="${process.env.FRONTEND_URL}/logo.webp"
+      <img src="${process.env.FRONTEND_ORIGIN}/logo.webp"
            alt="Tamkeen Center"
            width="150"
            style="display:block;margin:0 auto;" />
