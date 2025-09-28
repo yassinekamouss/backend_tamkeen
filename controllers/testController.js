@@ -166,92 +166,108 @@ exports.verifierElegibilite = asyncHandler(async (req, res) => {
       const emailSubject = "Résultat de votre test d’éligibilité";
 
       // Email si éligible
-      const emailEligible = `
-  <div style="font-family:Arial,sans-serif;line-height:1.5;">
-    <h2 style="color:#4CAF50;">Résultat de votre test d’éligibilité</h2>
-    <p>Bonjour,</p>
-    <p>Nous avons le plaisir de vous informer que vous êtes 
-       <strong style="color:#4CAF50;">éligible</strong> aux programmes de subvention proposés.</p>
+const emailEligible = `
+  <div style="background:#f4f4f4;padding:40px 0;font-family:Arial,Helvetica,sans-serif;">
+    <div style="max-width:600px;margin:0 auto;background:#ffffff;border-radius:8px;
+                padding:30px 40px;box-shadow:0 4px 12px rgba(0,0,0,0.05);
+                color:#333;line-height:1.6;font-size:16px;">
+      
+      <h2 style="color:#4CAF50;text-align:center;margin-top:0;margin-bottom:25px;
+                 font-size:24px;font-weight:bold;">
+        ✅ Résultat de votre test d’éligibilité
+      </h2>
 
-    <h3>Récapitulatif de vos données :</h3>
-    <ul>
-      ${blocNom}
-      <li><strong>Téléphone :</strong> ${personne.telephone || "—"}</li>
-      <li><strong>Email :</strong> ${personne.email || "—"}</li>
-      <li><strong>Ville :</strong> ${created.region || "—"}</li>
-      <li><strong>Statut Juridique :</strong> ${created.statutJuridique || "—"}</li>
-      <li><strong>Secteur d’activité :</strong> ${created.secteurTravail || "—"}</li>
-      <li><strong>Date de création :</strong> ${created.anneeCreation || "—"}</li>
-      <li><strong>Chiffres d'affaires :</strong><br>${chiffresAffairesTxt.replace(/\n/g, "<br>")}</li>
-      <li><strong>Montant d'investissement :</strong> ${created.montantInvestissement || "—"}</li>
-    </ul>
+      <p>Bonjour,</p>
 
-    <p>Notre équipe prendra contact avec vous prochainement pour :</p>
-    <ul>
-      <li>vous présenter les programmes qui correspondent le mieux à votre profil,</li>
-      <li>vous accompagner dans les démarches à suivre pour bénéficier du soutien,</li>
-      <li>et répondre à toutes vos questions.</li>
-    </ul>
+      <p>Nous avons le plaisir de vous informer que vous êtes
+         <strong style="color:#4CAF50;">éligible</strong> aux programmes de subvention proposés.</p>
 
-    <p>En attendant, vous pouvez préparer les documents relatifs à votre projet/entreprise
-     afin de faciliter la suite du processus.</p>
+      <h3 style="margin-top:30px;color:#4CAF50;">Récapitulatif de vos données :</h3>
+      <ul style="padding-left:20px;margin-top:15px;">
+        ${blocNom}
+        <li><strong>Téléphone :</strong> ${personne.telephone || "—"}</li>
+        <li><strong>Email :</strong> ${personne.email || "—"}</li>
+        <li><strong>Ville :</strong> ${created.region || "—"}</li>
+        <li><strong>Statut Juridique :</strong> ${created.statutJuridique || "—"}</li>
+        <li><strong>Secteur d’activité :</strong> ${created.secteurTravail || "—"}</li>
+        <li><strong>Date de création :</strong> ${created.anneeCreation || "—"}</li>
+        <li><strong>Chiffres d'affaires :</strong><br>${chiffresAffairesTxt.replace(/\n/g, "<br>")}</li>
+        <li><strong>Montant d'investissement :</strong> ${created.montantInvestissement || "—"}</li>
+      </ul>
 
-     <p>Nous restons à votre disposition pour tout complément d’information.</p>
-    
-     <p style="margin-top:25px;">Bien cordialement,</p>
+      <p style="margin-top:20px;">Notre équipe prendra contact avec vous prochainement pour :</p>
+      <ul style="padding-left:20px;">
+        <li>vous présenter les programmes adaptés,</li>
+        <li>vous accompagner dans les démarches,</li>
+        <li>répondre à vos questions.</li>
+      </ul>
 
-    <!--  Signature au centre -->
-    <div style="text-align:center;margin-top:20px;">
-      <img src="${process.env.FRONTEND_ORIGIN}/tamkeen.png"
-           alt="Tamkeen Center"
-           width="150"
-           style="display:block;margin:0 auto 10px auto;" />
-      <p style="font-weight:bold;font-size:16px;margin:0;">L’équipe Tamkeen</p>
+      <p>En attendant, préparez les documents relatifs à votre projet/entreprise
+         afin de faciliter la suite du processus.</p>
+
+      <p>Nous restons à votre disposition pour tout complément d’information.</p>
+
+      <p style="margin-top:30px;">Bien cordialement,</p>
+
+      <div style="text-align:center;margin-top:30px;">
+        <img src="${process.env.FRONTEND_ORIGIN}/tamkeen.png" alt="Tamkeen Center"
+             width="150" style="display:block;margin:0 auto 10px;" />
+        <p style="font-weight:bold;font-size:16px;margin:0;">L’équipe Tamkeen</p>
+      </div>
+
     </div>
   </div>
 `;
 
 
       //  Email si NON éligible
-     const emailNonEligible = `
-  <div style="font-family:Arial,sans-serif;line-height:1.5;">
-   
-    <h2 style="color:#E53935;">Résultat de votre test d’éligibilité</h2>
-    <p>Bonjour,</p>
-    <p>Suite à votre test d’éligibilité, nous vous informons que vous ne répondez pas actuellement 
-       aux critères requis pour accéder aux programmes de subvention proposés.</p>
+const emailNonEligible = `
+  <div style="background:#f4f4f4;padding:40px 0;font-family:Arial,Helvetica,sans-serif;">
+    <div style="max-width:600px;margin:0 auto;background:#ffffff;border-radius:8px;
+                padding:30px 40px;box-shadow:0 4px 12px rgba(0,0,0,0.05);
+                color:#333;line-height:1.6;font-size:16px;">
+      
+      <h2 style="color:#E53935;text-align:center;margin-top:0;margin-bottom:25px;
+                 font-size:24px;font-weight:bold;">
+        ❌ Résultat de votre test d’éligibilité
+      </h2>
 
-    <h3>Récapitulatif de vos données :</h3>
-    <ul>
-      ${blocNom}
-      <li><strong>Téléphone :</strong> ${personne.telephone || "—"}</li>
-      <li><strong>Email :</strong> ${personne.email || "—"}</li>
-      <li><strong>Ville :</strong> ${created.region || "—"}</li>
-      <li><strong>Statut Juridique :</strong> ${created.statutJuridique || "—"}</li>
-      <li><strong>Secteur d’activité :</strong> ${created.secteurTravail || "—"}</li>
-      <li><strong>Date de création :</strong> ${created.anneeCreation || "—"}</li>
-      <li><strong>Chiffres d'affaires :</strong><br>${chiffresAffairesTxt.replace(/\n/g, "<br>")}</li>
-      <li><strong>Montant d'investissement :</strong> ${created.montantInvestissement || "—"}</li>
-    </ul>
+      <p>Bonjour,</p>
 
-    <p>Cependant, d’autres solutions et dispositifs d’accompagnement peuvent être adaptés à votre profil.
-       Notre équipe reste à votre disposition pour vous orienter vers les alternatives les plus pertinentes.</p>
+      <p>Suite à votre test d’éligibilité, nous vous informons que vous ne répondez pas actuellement
+         aux critères requis pour accéder aux programmes de subvention proposés.</p>
+
+      <h3 style="margin-top:30px;color:#E53935;">Récapitulatif de vos données :</h3>
+      <ul style="padding-left:20px;margin-top:15px;">
+        ${blocNom}
+        <li><strong>Téléphone :</strong> ${personne.telephone || "—"}</li>
+        <li><strong>Email :</strong> ${personne.email || "—"}</li>
+        <li><strong>Ville :</strong> ${created.region || "—"}</li>
+        <li><strong>Statut Juridique :</strong> ${created.statutJuridique || "—"}</li>
+        <li><strong>Secteur d’activité :</strong> ${created.secteurTravail || "—"}</li>
+        <li><strong>Date de création :</strong> ${created.anneeCreation || "—"}</li>
+        <li><strong>Chiffres d'affaires :</strong><br>${chiffresAffairesTxt.replace(/\n/g, "<br>")}</li>
+        <li><strong>Montant d'investissement :</strong> ${created.montantInvestissement || "—"}</li>
+      </ul>
+
+      <p style="margin-top:20px;">Cependant, d’autres solutions et dispositifs d’accompagnement peuvent
+         être adaptés à votre profil. Notre équipe reste à votre disposition pour vous orienter
+         vers les alternatives les plus pertinentes.</p>
 
       <p>N’hésitez pas à nous contacter pour toute question ou besoin d’accompagnement.</p>
 
-     <div style="text-align:center;margin-top:30px;">
-     <p style="margin-top:25px;">Bien cordialement,</p>
+      <p style="margin-top:30px;">Bien cordialement,</p>
 
-    <!--  Signature au centre -->
-    <div style="text-align:center;margin-top:20px;">
-      <img src="${process.env.FRONTEND_ORIGIN}/tamkeen.png"
-           alt="Tamkeen Center"
-           width="150"
-           style="display:block;margin:0 auto 10px auto;" />
-      <p style="font-weight:bold;font-size:16px;margin:0;">L’équipe Tamkeen</p>
+      <div style="text-align:center;margin-top:30px;">
+        <img src="${process.env.FRONTEND_ORIGIN}/tamkeen.png" alt="Tamkeen Center"
+             width="150" style="display:block;margin:0 auto 10px;" />
+        <p style="font-weight:bold;font-size:16px;margin:0;">L’équipe Tamkeen</p>
+      </div>
+
     </div>
   </div>
 `;
+
 
       //  Envoi
       if (eligibleProgramNamesAndLinks.length > 0) {
