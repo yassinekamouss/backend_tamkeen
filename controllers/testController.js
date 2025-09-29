@@ -164,110 +164,139 @@ exports.verifierElegibilite = asyncHandler(async (req, res) => {
       }
 
       const emailSubject = "Résultat de votre test d’éligibilité";
-
-      // Email si éligible
 const emailEligible = `
-  <div style="background:#f4f4f4;padding:40px 0;font-family:Arial,Helvetica,sans-serif;">
-    <div style="max-width:600px;margin:0 auto;background:#ffffff;border-radius:8px;
-                padding:30px 40px;box-shadow:0 4px 12px rgba(0,0,0,0.05);
-                color:#333;line-height:1.6;font-size:16px;">
+  <div style="background:#f5f5f5;padding:40px 0;font-family:'Segoe UI',Arial,sans-serif;">
+    <div style="max-width:640px;margin:0 auto;background:#ffffff;border-radius:12px;
+                padding:40px;box-shadow:0 4px 20px rgba(0,0,0,0.06);
+                color:#2d3748;line-height:1.7;font-size:15px;">
       
-      <h2 style="color:#4CAF50;text-align:center;margin-top:0;margin-bottom:25px;
-                 font-size:24px;font-weight:bold;">
-        ✅ Résultat de votre test d’éligibilité
-      </h2>
+      <div style="text-align:center;margin-bottom:30px;">
+        <h2 style="color:#2f855a;margin:0;font-size:26px;font-weight:600;">
+          ✅ Résultat de votre test d'éligibilité
+        </h2>
+        <div style="width:60px;height:3px;background:#2f855a;margin:16px auto;border-radius:2px;"></div>
+      </div>
 
       <p>Bonjour,</p>
 
       <p>Nous avons le plaisir de vous informer que vous êtes
-         <strong style="color:#4CAF50;">éligible</strong> aux programmes de subvention proposés.</p>
+         <strong style="color:#2f855a;background:#f0fff4;padding:3px 8px;border-radius:4px;">éligible</strong> 
+         aux programmes de subvention proposés.</p>
 
-      <h3 style="margin-top:30px;color:#4CAF50;">Récapitulatif de vos données :</h3>
-      <ul style="padding-left:20px;margin-top:15px;">
-        ${blocNom}
-        <li><strong>Téléphone :</strong> ${personne.telephone || "—"}</li>
-        <li><strong>Email :</strong> ${personne.email || "—"}</li>
-        <li><strong>Ville :</strong> ${created.region || "—"}</li>
-        <li><strong>Statut Juridique :</strong> ${created.statutJuridique || "—"}</li>
-        <li><strong>Secteur d’activité :</strong> ${created.secteurTravail || "—"}</li>
-        <li><strong>Date de création :</strong> ${created.anneeCreation || "—"}</li>
-        <li><strong>Chiffres d'affaires :</strong><br>${chiffresAffairesTxt.replace(/\n/g, "<br>")}</li>
-        <li><strong>Montant d'investissement :</strong> ${created.montantInvestissement || "—"}</li>
-      </ul>
+      <h3 style="margin-top:28px;color:#2f855a;font-size:18px;font-weight:600;">Récapitulatif de vos données :</h3>
+      <div style="background:#fafafa;border-radius:8px;padding:18px;margin:16px 0;border:1px solid #e5e7eb;">
+        <ul style="padding-left:18px;margin:0;list-style-type:none;">
+          ${blocNom}
+          <li style="margin-bottom:6px;"><strong>Téléphone :</strong> ${personne.telephone || "—"}</li>
+          <li style="margin-bottom:6px;"><strong>Email :</strong> ${personne.email || "—"}</li>
+          <li style="margin-bottom:6px;"><strong>Ville :</strong> ${created.region || "—"}</li>
+          <li style="margin-bottom:6px;"><strong>Statut Juridique :</strong> ${created.statutJuridique || "—"}</li>
+          <li style="margin-bottom:6px;"><strong>Secteur d'activité :</strong> ${created.secteurTravail || "—"}</li>
+          <li style="margin-bottom:6px;"><strong>Date de création :</strong> ${created.anneeCreation || "—"}</li>
+          <li style="margin-bottom:6px;"><strong>Chiffres d'affaires :</strong><br>${chiffresAffairesTxt.replace(/\n/g, "<br>")}</li>
+          <li><strong>Montant d'investissement :</strong> ${created.montantInvestissement || "—"}</li>
+        </ul>
+      </div>
 
-      <p style="margin-top:20px;">Notre équipe prendra contact avec vous prochainement pour :</p>
-      <ul style="padding-left:20px;">
+      <p style="margin-top:18px;">Notre équipe prendra contact avec vous prochainement pour :</p>
+      <ul style="padding-left:18px;margin:8px 0;">
         <li>vous présenter les programmes adaptés,</li>
         <li>vous accompagner dans les démarches,</li>
         <li>répondre à vos questions.</li>
       </ul>
 
-      <p>En attendant, préparez les documents relatifs à votre projet/entreprise
-         afin de faciliter la suite du processus.</p>
+      <p>En attendant, préparez les documents relatifs à votre projet/entreprise afin de faciliter la suite du processus.</p>
 
-      <p>Nous restons à votre disposition pour tout complément d’information.</p>
+      <p>Nous restons à votre disposition pour tout complément d'information.</p>
 
-      <p style="margin-top:30px;">Bien cordialement,</p>
+      <p style="margin-top:24px;">Bien cordialement,</p>
 
-      <div style="text-align:center;margin-top:30px;">
+      <div style="border-top:1px solid #e2e8f0;margin-top:32px;padding-top:24px;text-align:center;">
         <img src="${process.env.FRONTEND_ORIGIN}/tamkeen.png" alt="Tamkeen Center"
-             width="150" style="display:block;margin:0 auto 10px;" />
-        <p style="font-weight:bold;font-size:16px;margin:0;">L’équipe Tamkeen</p>
+             width="120" style="display:block;margin:0 auto 14px;" />
+        <p style="font-weight:600;font-size:16px;margin:0 0 4px;color:#2d3748;">L'équipe Tamkeen</p>
+        <p style="font-size:13px;color:#6b7280;margin:0 0 12px;">Centre d'accompagnement & développement</p>
+        
+        <div style="margin-top:12px;">
+          <a href="https://www.facebook.com/share/16W7DLrytf/?mibextid=wwXIfr" style="display:inline-block;margin:0 6px;" target="_blank">
+            <img src="https://cdn-icons-png.flaticon.com/512/733/733547.png" width="26" style="border-radius:50%;background:#f3f4f6;padding:6px;"/>
+          </a>
+          <a href="https://www.linkedin.com/company/tamkeen-center/" style="display:inline-block;margin:0 6px;" target="_blank">
+            <img src="https://cdn-icons-png.flaticon.com/512/3536/3536505.png" width="26" style="border-radius:50%;background:#f3f4f6;padding:6px;"/>
+          </a>
+          <a href="https://www.instagram.com/tamkeen_center_consulting?igsh=NjllczJzNDRsdWRq" style="display:inline-block;margin:0 6px;" target="_blank">
+            <img src="https://cdn-icons-png.flaticon.com/512/2111/2111463.png" width="26" style="border-radius:50%;background:#f3f4f6;padding:6px;"/>
+          </a>
+        </div>
       </div>
 
     </div>
   </div>
 `;
 
-
-      //  Email si NON éligible
 const emailNonEligible = `
-  <div style="background:#f4f4f4;padding:40px 0;font-family:Arial,Helvetica,sans-serif;">
-    <div style="max-width:600px;margin:0 auto;background:#ffffff;border-radius:8px;
-                padding:30px 40px;box-shadow:0 4px 12px rgba(0,0,0,0.05);
-                color:#333;line-height:1.6;font-size:16px;">
+  <div style="background:#f5f5f5;padding:40px 0;font-family:'Segoe UI',Arial,sans-serif;">
+    <div style="max-width:640px;margin:0 auto;background:#ffffff;border-radius:12px;
+                padding:40px;box-shadow:0 4px 20px rgba(0,0,0,0.06);
+                color:#2d3748;line-height:1.7;font-size:15px;">
       
-      <h2 style="color:#E53935;text-align:center;margin-top:0;margin-bottom:25px;
-                 font-size:24px;font-weight:bold;">
-        ❌ Résultat de votre test d’éligibilité
-      </h2>
+      <div style="text-align:center;margin-bottom:30px;">
+        <h2 style="color:#c53030;margin:0;font-size:26px;font-weight:600;">
+          ❌ Résultat de votre test d'éligibilité
+        </h2>
+        <div style="width:60px;height:3px;background:#c53030;margin:16px auto;border-radius:2px;"></div>
+      </div>
 
       <p>Bonjour,</p>
 
-      <p>Suite à votre test d’éligibilité, nous vous informons que vous ne répondez pas actuellement
+      <p>Suite à votre test d'éligibilité, nous vous informons que vous ne répondez pas actuellement
          aux critères requis pour accéder aux programmes de subvention proposés.</p>
 
-      <h3 style="margin-top:30px;color:#E53935;">Récapitulatif de vos données :</h3>
-      <ul style="padding-left:20px;margin-top:15px;">
-        ${blocNom}
-        <li><strong>Téléphone :</strong> ${personne.telephone || "—"}</li>
-        <li><strong>Email :</strong> ${personne.email || "—"}</li>
-        <li><strong>Ville :</strong> ${created.region || "—"}</li>
-        <li><strong>Statut Juridique :</strong> ${created.statutJuridique || "—"}</li>
-        <li><strong>Secteur d’activité :</strong> ${created.secteurTravail || "—"}</li>
-        <li><strong>Date de création :</strong> ${created.anneeCreation || "—"}</li>
-        <li><strong>Chiffres d'affaires :</strong><br>${chiffresAffairesTxt.replace(/\n/g, "<br>")}</li>
-        <li><strong>Montant d'investissement :</strong> ${created.montantInvestissement || "—"}</li>
-      </ul>
+      <h3 style="margin-top:28px;color:#c53030;font-size:18px;font-weight:600;">Récapitulatif de vos données :</h3>
+      <div style="background:#fafafa;border-radius:8px;padding:18px;margin:16px 0;border:1px solid #e5e7eb;">
+        <ul style="padding-left:18px;margin:0;list-style-type:none;">
+          ${blocNom}
+          <li style="margin-bottom:6px;"><strong>Téléphone :</strong> ${personne.telephone || "—"}</li>
+          <li style="margin-bottom:6px;"><strong>Email :</strong> ${personne.email || "—"}</li>
+          <li style="margin-bottom:6px;"><strong>Ville :</strong> ${created.region || "—"}</li>
+          <li style="margin-bottom:6px;"><strong>Statut Juridique :</strong> ${created.statutJuridique || "—"}</li>
+          <li style="margin-bottom:6px;"><strong>Secteur d'activité :</strong> ${created.secteurTravail || "—"}</li>
+          <li style="margin-bottom:6px;"><strong>Date de création :</strong> ${created.anneeCreation || "—"}</li>
+          <li style="margin-bottom:6px;"><strong>Chiffres d'affaires :</strong><br>${chiffresAffairesTxt.replace(/\n/g, "<br>")}</li>
+          <li><strong>Montant d'investissement :</strong> ${created.montantInvestissement || "—"}</li>
+        </ul>
+      </div>
 
-      <p style="margin-top:20px;">Cependant, d’autres solutions et dispositifs d’accompagnement peuvent
+      <p style="margin-top:18px;">Cependant, d'autres solutions et dispositifs d'accompagnement peuvent
          être adaptés à votre profil. Notre équipe reste à votre disposition pour vous orienter
          vers les alternatives les plus pertinentes.</p>
 
-      <p>N’hésitez pas à nous contacter pour toute question ou besoin d’accompagnement.</p>
+      <p>N'hésitez pas à nous contacter pour toute question ou besoin d'accompagnement.</p>
 
-      <p style="margin-top:30px;">Bien cordialement,</p>
+      <p style="margin-top:24px;">Bien cordialement,</p>
 
-      <div style="text-align:center;margin-top:30px;">
+      <div style="border-top:1px solid #e2e8f0;margin-top:32px;padding-top:24px;text-align:center;">
         <img src="${process.env.FRONTEND_ORIGIN}/tamkeen.png" alt="Tamkeen Center"
-             width="150" style="display:block;margin:0 auto 10px;" />
-        <p style="font-weight:bold;font-size:16px;margin:0;">L’équipe Tamkeen</p>
+             width="120" style="display:block;margin:0 auto 14px;" />
+        <p style="font-weight:600;font-size:16px;margin:0 0 4px;color:#2d3748;">L'équipe Tamkeen</p>
+        <p style="font-size:13px;color:#6b7280;margin:0 0 12px;">Centre d'accompagnement & développement</p>
+        
+        <div style="margin-top:12px;">
+          <a href="https://www.facebook.com/share/16W7DLrytf/?mibextid=wwXIfr" style="display:inline-block;margin:0 6px;" target="_blank">
+            <img src="https://cdn-icons-png.flaticon.com/512/733/733547.png" width="26" style="border-radius:50%;background:#f3f4f6;padding:6px;"/>
+          </a>
+          <a href="https://www.linkedin.com/company/tamkeen-center/" style="display:inline-block;margin:0 6px;" target="_blank">
+            <img src="https://cdn-icons-png.flaticon.com/512/3536/3536505.png" width="26" style="border-radius:50%;background:#f3f4f6;padding:6px;"/>
+          </a>
+          <a href="https://www.instagram.com/tamkeen_center_consulting?igsh=NjllczJzNDRsdWRq" style="display:inline-block;margin:0 6px;" target="_blank">
+            <img src="https://cdn-icons-png.flaticon.com/512/2111/2111463.png" width="26" style="border-radius:50%;background:#f3f4f6;padding:6px;"/>
+          </a>
+        </div>
       </div>
 
     </div>
   </div>
 `;
-
 
       //  Envoi
       if (eligibleProgramNamesAndLinks.length > 0) {
@@ -278,7 +307,7 @@ const emailNonEligible = `
 
 
 
-    return api.created(res, { programs: eligibleProgramNamesAndLinks });
+    return api.created(res, { programs: eligibleProgramNamesAndLinks , testId: created._id });
   } catch (err) {
     //  Gestion spécifique des erreurs de clé dupliquée
     if (err.code === 11000) {
@@ -385,4 +414,26 @@ exports.getAllTests = asyncHandler(async (req, res) => {
     total,
     hasMore: skip + data.length < total,
   });
+});
+
+
+exports.updateContactPreference = asyncHandler(async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const test = await TestElegibilite.findByIdAndUpdate(
+      id,
+      { wannaBeContacted: true },
+      { new: true } // retourne l'objet mis à jour
+    );
+
+    if (!test) {
+      return res.status(404).json({ message: "Test non trouvé" });
+    }
+
+    res.json({ success: true, test });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Erreur serveur" });
+  }
 });

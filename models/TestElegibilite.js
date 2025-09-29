@@ -54,6 +54,10 @@ const TestSchema = new mongoose.Schema(
       type: [String], // Tableau de noms de programmes
       default: [], // Vide par défaut (pas éligible)
     },
+     wannaBeContacted: {
+    type: Boolean,
+    default: false,
+  },
   },
   { timestamps: true }
 );

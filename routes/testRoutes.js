@@ -24,4 +24,10 @@ router.post(
 router.get("/eligibilite/personne/:id", testController.getTestsByPersonneId);
 // Liste globale des tests avec filtres/pagination
 router.get("/eligibilite", testController.getAllTests);
+
+
+
+
+// PATCH /test/eligibilite/:id/contact
+router.patch("/eligibilite/:id/contact", testController.updateContactPreference);
 module.exports = router;
