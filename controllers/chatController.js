@@ -12,16 +12,18 @@ const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 const SYSTEM_PROMPT = `Tu es l'assistant virtuel de Tamkeen, spécialisé dans l'aide aux entrepreneurs marocains pour accéder aux programmes de subventions.
 
 **TON RÔLE :**
-- Aider les utilisateurs à découvrir les programmes de subventions
+- Aider les utilisateurs à découvrir les programmes de subventions (publics / institutionnels) référencés par Tamkeen (Tamkeen n'est pas l'organisme financeur)
 - Collecter les informations nécessaires UNE PAR UNE de manière naturelle
-- Faire le test d'éligibilité final avec tous les programmes disponibles
+- Faire le test d'éligibilité final avec les programmes référencés pertinents
 
 **RÈGLES ABSOLUES :**
 ✅ UNE SEULE QUESTION À LA FOIS - JAMAIS de listes de questions multiples
 ✅ Questions très courtes et naturelles (1 phrase)
 ✅ NE JAMAIS redemander une information déjà fournie dans l'historique
 ✅ Faire le test d'éligibilité dès que TOUTES les informations requises sont collectées
+❗ Ne dis jamais "nos programmes" ou "nos subventions". Utilise uniquement: "programmes référencés par Tamkeen", "programmes que nous référençons" ou "programmes publics référencés".
 ✅ TOUJOURS poser les questions dans l'ordre logique
+ ✅ Si l'utilisateur demande des informations de contact (email, téléphone, site web, support, comment vous joindre, contact, contacter, Whatsapp, numéro, email), tu DOIS appeler la fonction getContactInfo et répondre UNIQUEMENT avec ces données sans les inventer. N'invente pas d'autres coordonnées. Si une info n'existe pas dans getContactInfo, dis poliment qu'elle n'est pas disponible.
 
 **INFORMATIONS À COLLECTER UNE PAR UNE :**
 Pour PERSONNE PHYSIQUE (6 informations dans cet ordre):
@@ -52,6 +54,28 @@ Pour ENTREPRISE (6 informations dans cet ordre):
 - Test final : "Parfait ! Je vais maintenant vérifier votre éligibilité..."
 
 CRUCIAL : UNE QUESTION À LA FOIS - JAMAIS DE LISTES MULTIPLES !`;
+
+// Simple helper to detect contact info intent locally (avoid token usage + force canonical data)
+function isContactInfoQuery(text = "") {
+  const lower = text.toLowerCase();
+  // Keywords in FR + generic + potential Arabic transliterations
+  const patterns = [
+    /contact/,
+    /contacter/,
+    /coordonn[eé]es/,
+    /email/,
+    /mail/,
+    /t[ée]l[ée]?(?:phone)?/,
+    /num[ée]ro/,
+    /whats?app/,
+    /support/,
+    /site\s?web/,
+    /adresse/,
+    /how (?:can )?i contact/i,
+    /reach you/i,
+  ];
+  return patterns.some((p) => p.test(lower));
+}
 
 // Définition des outils/functions pour ChatGPT (simplifié)
 const CHAT_FUNCTIONS = [
@@ -147,7 +171,7 @@ async function getTamkeenInfo() {
     services: [
       "Test d'éligibilité en ligne rapide",
       "Accompagnement personnalisé avec consultants experts",
-      "Information complète sur tous les programmes disponibles",
+      "Information complète sur les programmes publics et dispositifs référencés",
       "Suivi de dossier tout au long du processus",
     ],
     avantages:
@@ -157,12 +181,12 @@ async function getTamkeenInfo() {
 
 async function getContactInfo() {
   return {
-    siteWeb: "http://masubvention.com",
+    siteWeb: "http://masubvention.ma",
     email: "contact@subvention.ma",
     telephone: "+212 522 00 00 00",
     heures: "Lundi-Vendredi 9h00-18h00",
-    support:
-      "Équipe de consultants experts disponibles pour accompagnement gratuit",
+    // support:
+    //   "Équipe de consultants experts disponibles pour accompagnement gratuit",
     delaiContact:
       "Un consultant vous contactera dans les 24h après soumission du formulaire",
   };
@@ -439,6 +463,20 @@ async function chatWithAI(req, res) {
     const { message, history } = req.body || {};
     if (!message || typeof message !== "string") {
       return res.status(400).json({ message: "Champ 'message' requis." });
+    }
+
+    // Local intent detection for contact info queries: bypass model to guarantee canonical data
+    if (isContactInfoQuery(message)) {
+      const info = await getContactInfo();
+      const gmailCompose = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(
+        info.email
+      )}`;
+      const responseText = `Voici nos informations de contact officielles :\n- Site web : [${info.siteWeb}](${info.siteWeb})\n- Email : [${info.email}](${gmailCompose})\n- Téléphone : ${info.telephone}\n- Horaires : ${info.heures}\n- Délai de contact : ${info.delaiContact}`;
+      return res.json({
+        response: responseText,
+        functionUsed: "getContactInfo",
+        direct: true,
+      });
     }
 
     // Sanitize and bound history
