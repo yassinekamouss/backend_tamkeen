@@ -11,7 +11,7 @@ const PersonneSchema = new mongoose.Schema(
     sexe: String, // pour physique
     nomEntreprise: String, // pour morale
     email: { type: String, required: true, unique: true },
-    telephone: { type: String, required: true, unique: true },
+    telephone: { type: [String], required: true, unique: false },//rendre ça un tableau
     age: { type: Number, min: 18, max: 100 }, // pour physique
     etat: { type: String, enum: ["En traitement", "En attente", "Terminé"], default: "En attente" },
     //ID du consultant associé

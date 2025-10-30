@@ -10,43 +10,76 @@ const { logActivity } = require("../utils/activity");
 exports.verifierElegibilite = asyncHandler(async (req, res) => {
   try {
     const data = req.body;
-
     let personne = await Personne.findOne({ email: data.email });
 
     if (personne) {
-      if (data.applicantType === "physique") {
-        const infosIdentiques =
-          personne.nom === data.nom &&
-          personne.prenom === data.prenom &&
-          Number(personne.age) === Number(data.age) &&
-          personne.sexe === data.sexe &&
-          personne.telephone === data.telephone;
-
-        if (!infosIdentiques) {
-          return api.error(
-            res,
-            "Cet email est déjà utilisé par une autre personne physique avec des informations différentes.",
-            400
-          );
-        }
-      } else if (data.applicantType === "morale") {
-        const infosIdentiques =
-          personne.nomEntreprise === data.nomEntreprise &&
-          personne.email === data.email &&
-          personne.telephone === data.telephone;
-
-        if (!infosIdentiques) {
-          return api.error(
-            res,
-            "Cet email est déjà utilisé par une autre entreprise avec des informations différentes.",
-            400
-          );
-        }
+      // --- CAS 1 : même email mais type différent ---
+      if (personne.applicantType !== data.applicantType) {
+        // On autorise, car c’est une autre catégorie (morale vs physique)
+        personne = await Personne.create({
+          applicantType: data.applicantType,
+          nom: data.nom,
+          prenom: data.prenom,
+          age: data.age,
+          sexe: data.sexe,
+          nomEntreprise: data.nomEntreprise,
+          email: data.email,
+          telephone: data.telephone,
+        });
       } else {
-        return api.error(res, "Type de demandeur inconnu ou non valide.", 400);
+        // --- CAS 2 et 3 : même type ---
+        if (data.applicantType === "physique") {
+          const infosIdentiques =
+            personne.nom === data.nom &&
+            personne.prenom === data.prenom &&
+            Number(personne.age) === Number(data.age) &&
+            personne.sexe === data.sexe;
+
+          if (infosIdentiques) {
+            // Même personne, on vérifie si le téléphone est déjà enregistré
+            if (personne.telephone !== data.telephone) {
+              // On peut ici garder l’ancien ou mettre à jour
+              await Personne.updateOne(
+                { _id: personne._id },
+                { $addToSet: { anciensTelephones: data.telephone } } // facultatif si tu veux stocker l'historique
+              );
+              personne.telephone = data.telephone;
+              await personne.save();
+            }
+          } else {
+            // --- CAS 3 : même email, infos différentes ---
+            return api.error(
+              res,
+              "Cet email est déjà utilisé par une autre personne physique avec des informations différentes. Veuillez vérifier vos données.",
+              400
+            );
+          }
+        } else if (data.applicantType === "morale") {
+          const infosIdentiques =
+            personne.nomEntreprise === data.nomEntreprise;
+
+          if (infosIdentiques) {
+            if (personne.telephone !== data.telephone) {
+              await Personne.updateOne(
+                { _id: personne._id },
+                { $addToSet: { anciensTelephones: data.telephone } }
+              );
+              personne.telephone = data.telephone;
+              await personne.save();
+            }
+          } else {
+            return api.error(
+              res,
+              "Cet email est déjà utilisé par une autre entreprise avec des informations différentes.",
+              400
+            );
+          }
+        } else {
+          return api.error(res, "Type de demandeur inconnu ou non valide.", 400);
+        }
       }
     } else {
-      // Créer la personne si elle n'existe pas
+      // --- Aucun utilisateur avec cet email → création normale ---
       personne = await Personne.create({
         applicantType: data.applicantType,
         nom: data.nom,
@@ -118,11 +151,10 @@ exports.verifierElegibilite = asyncHandler(async (req, res) => {
       await logActivity(req, {
         type: "test_submitted",
         title: "Nouveau test d'éligibilité",
-        message: `${applicantName || "Utilisateur"} • ${created.region} • ${
-          eligibleProgramNamesAndLinks.length
+        message: `${applicantName || "Utilisateur"} • ${created.region} • ${eligibleProgramNamesAndLinks.length
             ? `${eligibleProgramNamesAndLinks.length} programme(s) éligible(s)`
             : "Aucun programme éligible"
-        }`,
+          }`,
         entity: { kind: "test", id: String(created._id) },
         meta: {
           region: created.region,
@@ -140,8 +172,8 @@ exports.verifierElegibilite = asyncHandler(async (req, res) => {
       console.warn("Activity log failed (test_submitted):", e?.message || e);
     }
 
-      //  Gérer les noms en fonction du type
-      let blocNom;
+    //  Gérer les noms en fonction du type
+    let blocNom;
     if (personne.applicantType === "morale") {
       blocNom = `<li><strong>Nom de l'entreprise :</strong> ${personne.nomEntreprise || "—"}</li>`;
     } else {
@@ -151,20 +183,20 @@ exports.verifierElegibilite = asyncHandler(async (req, res) => {
       `;
     }
 
-      //  Affichage clair des chiffres d'affaires
-      let chiffresAffairesTxt = "";
-      const ca = created.chiffreAffaires || {};
-      if (ca.chiffreAffaire2022 || ca.chiffreAffaire2023 || ca.chiffreAffaire2024) {
-        chiffresAffairesTxt +=
-          `2022 : ${ca.chiffreAffaire2022 ?? "—"} DH\n` +
-          `2023 : ${ca.chiffreAffaire2023 ?? "—"} DH\n` +
-          `2024 : ${ca.chiffreAffaire2024 ?? "—"} DH`;
-      } else {
-        chiffresAffairesTxt = "Non renseigné";
-      }
+    //  Affichage clair des chiffres d'affaires
+    let chiffresAffairesTxt = "";
+    const ca = created.chiffreAffaires || {};
+    if (ca.chiffreAffaire2022 || ca.chiffreAffaire2023 || ca.chiffreAffaire2024) {
+      chiffresAffairesTxt +=
+        `2022 : ${ca.chiffreAffaire2022 ?? "—"} DH\n` +
+        `2023 : ${ca.chiffreAffaire2023 ?? "—"} DH\n` +
+        `2024 : ${ca.chiffreAffaire2024 ?? "—"} DH`;
+    } else {
+      chiffresAffairesTxt = "Non renseigné";
+    }
 
-      const emailSubject = "Résultat de votre test d’éligibilité";
-const emailEligible = `
+    const emailSubject = "Résultat de votre test d’éligibilité";
+    const emailEligible = `
   <div style="background:#f5f5f5;padding:40px 0;font-family:'Segoe UI',Arial,sans-serif;">
     <div style="max-width:640px;margin:0 auto;background:#ffffff;border-radius:12px;
                 padding:40px;box-shadow:0 4px 20px rgba(0,0,0,0.06);
@@ -234,7 +266,7 @@ const emailEligible = `
   </div>
 `;
 
-const emailNonEligible = `
+    const emailNonEligible = `
   <div style="background:#f5f5f5;padding:40px 0;font-family:'Segoe UI',Arial,sans-serif;">
     <div style="max-width:640px;margin:0 auto;background:#ffffff;border-radius:12px;
                 padding:40px;box-shadow:0 4px 20px rgba(0,0,0,0.06);
@@ -298,16 +330,16 @@ const emailNonEligible = `
   </div>
 `;
 
-      //  Envoi
-      if (eligibleProgramNamesAndLinks.length > 0) {
-        await sendEmail(data.email, emailSubject, emailEligible);
-      } else {
-        await sendEmail(data.email, emailSubject, emailNonEligible);
-      }
+    //  Envoi
+    if (eligibleProgramNamesAndLinks.length > 0) {
+      await sendEmail(data.email, emailSubject, emailEligible);
+    } else {
+      await sendEmail(data.email, emailSubject, emailNonEligible);
+    }
 
 
 
-    return api.created(res, { programs: eligibleProgramNamesAndLinks , testId: created._id });
+    return api.created(res, { programs: eligibleProgramNamesAndLinks, testId: created._id });
   } catch (err) {
     //  Gestion spécifique des erreurs de clé dupliquée
     if (err.code === 11000) {
