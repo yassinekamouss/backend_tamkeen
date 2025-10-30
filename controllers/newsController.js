@@ -52,6 +52,32 @@ exports.getNewsCategories = asyncHandler(async (_req, res) => {
   res.json({ success: true, data: categories });
 });
 
+// GET - Obtenir une actualité par slug ou id numérique
+exports.getNewsBySlugOrId = asyncHandler(async (req, res) => {
+  const { slugOrId } = req.params;
+
+  const publishedFilter = { published: { $ne: false } };
+
+  let item = null;
+  if (slugOrId && isNaN(Number(slugOrId))) {
+    item = await News.findOne({ slug: slugOrId, ...publishedFilter }).lean();
+  }
+  if (!item) {
+    const numId = parseInt(slugOrId, 10);
+    if (!Number.isNaN(numId)) {
+      item = await News.findOne({ id: numId, ...publishedFilter }).lean();
+    }
+  }
+
+  if (!item) {
+    return res
+      .status(404)
+      .json({ success: false, message: "Article non trouvé" });
+  }
+
+  res.json({ success: true, data: item });
+});
+
 // POST - Créer une nouvelle actualité (Admin) – conserve le champ id numérique
 exports.createNews = asyncHandler(async (req, res) => {
   const {

@@ -4,6 +4,7 @@ const authAdmin = require("../middlewares/authAdmin");
 const {
   getAllNews,
   getNewsCategories,
+  getNewsBySlugOrId,
   createNews,
   updateNews,
   deleteNews,
@@ -14,6 +15,9 @@ router.get("/", getAllNews);
 
 // GET /api/news/categories - Récupérer toutes les catégories
 router.get("/categories", getNewsCategories);
+
+// GET /api/news/:slugOrId - Détail d'une actualité
+router.get("/:slugOrId", getNewsBySlugOrId);
 
 // Routes admin (CRUD)
 // POST /api/news - Créer une nouvelle actualité
