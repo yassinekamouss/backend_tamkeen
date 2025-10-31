@@ -70,7 +70,7 @@ exports.exportUsers = asyncHandler(async (req, res) => {
       { header: "email", key: "email", width: 30 },
       { header: "programmesEligibles", key: "programmesEligibles", width: 30 },
       { header: "type", key: "type", width: 25 },
-      { header: "telephone", key: "telephone", width: 20 },
+      { header: "telephone", key: "telephone", width: 30 },
       { header: "zone", key: "zone", width: 25 },
       { header: "statut_juridique", key: "statut_juridique", width: 20 },
       { header: "secteur_activite", key: "secteur_activite", width: 30 },
@@ -113,7 +113,9 @@ exports.exportUsers = asyncHandler(async (req, res) => {
           ? test.programmesEligibles.join(", ")
           : "N/A",
         type: personne.applicantType || "N/A",
-        telephone: personne.telephone || "N/A",
+        telephone: Array.isArray(personne.telephones)
+          ? personne.telephones.join(", ") || "N/A"
+          : personne.telephone || "N/A",
         zone: test.region || "N/A",
         statut_juridique: test.statutJuridique || "N/A",
         secteur_activite: test.secteurTravail || "N/A",
@@ -198,7 +200,6 @@ exports.getUserById = asyncHandler(async (req, res) => {
   return res.status(200).json(personne);
 });
 
-
 exports.getUserByconsultant = asyncHandler(async (req, res) => {
   const personnes = await Personne.find({ consultantAssocie: req.params.id });
   return res.status(200).json(personnes);
@@ -208,6 +209,12 @@ exports.getUserByconsultant = asyncHandler(async (req, res) => {
 exports.updateUser = asyncHandler(async (req, res) => {
   try {
     const { consultantAssocie, ...rest } = req.body; // consultantAssocie peut être un ID ou un objet {_id, username}
+    // Normaliser le téléphone: accepter soit `telephone` (string), soit `telephones` (array)
+    const updatePayload = { ...rest };
+    if (typeof rest.telephone === "string" && rest.telephone.trim() !== "") {
+      updatePayload.telephones = [rest.telephone.trim()];
+      delete updatePayload.telephone;
+    }
     const consultantAssocieId =
       consultantAssocie && typeof consultantAssocie === "object"
         ? consultantAssocie._id
@@ -226,7 +233,7 @@ exports.updateUser = asyncHandler(async (req, res) => {
     const updated = await Personne.findByIdAndUpdate(
       req.params.id,
       {
-        ...rest,
+        ...updatePayload,
         consultantAssocie: admin._id, // on stocke la référence
       },
       { new: true }
@@ -245,16 +252,18 @@ exports.updateUser = asyncHandler(async (req, res) => {
           etat: updated.etat,
           consultantAssocie: updated.consultantAssocie
             ? {
-              _id: String(updated.consultantAssocie._id),
-              username: updated.consultantAssocie.username,
-            }
+                _id: String(updated.consultantAssocie._id),
+                username: updated.consultantAssocie.username,
+              }
             : null,
           applicantType: updated.applicantType,
           nom: updated.nom,
           prenom: updated.prenom,
           nomEntreprise: updated.nomEntreprise,
           email: updated.email,
-          telephone: updated.telephone,
+          telephone: Array.isArray(updated.telephones)
+            ? updated.telephones[0]
+            : updated.telephone,
           createdAt: updated.createdAt,
         });
       }
@@ -273,17 +282,18 @@ exports.updateUser = asyncHandler(async (req, res) => {
         await logActivity(req, {
           type: "user_updated",
           title: "Utilisateur mis à jour",
-          message: `${name || "Utilisateur"} • état: ${previous.etat} → ${updated.etat
-            }`,
+          message: `${name || "Utilisateur"} • état: ${previous.etat} → ${
+            updated.etat
+          }`,
           entity: { kind: "user", id: String(updated._id) },
           meta: {
             from: previous.etat,
             to: updated.etat,
             consultantAssocie: updated.consultantAssocie
               ? {
-                _id: String(updated.consultantAssocie._id),
-                username: updated.consultantAssocie.username,
-              }
+                  _id: String(updated.consultantAssocie._id),
+                  username: updated.consultantAssocie.username,
+                }
               : null,
           },
           actor: req.admin || null,

@@ -11,7 +11,11 @@ exports.verifierElegibilite = asyncHandler(async (req, res) => {
   try {
     const data = req.body;
 
-    let personne = await Personne.findOne({ email: data.email });
+    // Important: autoriser le même email sur des types différents
+    let personne = await Personne.findOne({
+      email: data.email,
+      applicantType: data.applicantType,
+    });
 
     if (personne) {
       if (data.applicantType === "physique") {
@@ -19,31 +23,46 @@ exports.verifierElegibilite = asyncHandler(async (req, res) => {
           personne.nom === data.nom &&
           personne.prenom === data.prenom &&
           Number(personne.age) === Number(data.age) &&
-          personne.sexe === data.sexe &&
-          personne.telephone === data.telephone;
+          personne.sexe === data.sexe;
 
         if (!infosIdentiques) {
           return api.error(
             res,
-            "Cet email est déjà utilisé par une autre personne physique avec des informations différentes.",
+            "Cet email est déjà utilisé par une autre personne physique avec des informations différentes (hors numéro).",
             400
           );
         }
       } else if (data.applicantType === "morale") {
         const infosIdentiques =
           personne.nomEntreprise === data.nomEntreprise &&
-          personne.email === data.email &&
-          personne.telephone === data.telephone;
+          personne.email === data.email;
 
         if (!infosIdentiques) {
           return api.error(
             res,
-            "Cet email est déjà utilisé par une autre entreprise avec des informations différentes.",
+            "Cet email est déjà utilisé par une autre entreprise avec des informations différentes (hors numéro).",
             400
           );
         }
       } else {
         return api.error(res, "Type de demandeur inconnu ou non valide.", 400);
+      }
+
+      // Mettre à jour la liste des téléphones si un nouveau numéro est fourni
+      if (data.telephone) {
+        const currentPhones = Array.isArray(personne.telephones)
+          ? personne.telephones
+          : [];
+        if (!currentPhones.includes(data.telephone)) {
+          currentPhones.push(data.telephone);
+          personne.telephones = currentPhones;
+          // Sanitize etat for legacy documents that might have an empty string
+          const allowedEtats = ["En traitement", "En attente", "Terminé"];
+          if (!allowedEtats.includes(personne.etat)) {
+            personne.etat = "En attente";
+          }
+          await personne.save();
+        }
       }
     } else {
       // Créer la personne si elle n'existe pas
@@ -55,7 +74,7 @@ exports.verifierElegibilite = asyncHandler(async (req, res) => {
         sexe: data.sexe,
         nomEntreprise: data.nomEntreprise,
         email: data.email,
-        telephone: data.telephone,
+        telephones: data.telephone ? [data.telephone] : [],
       });
     }
 
@@ -140,10 +159,12 @@ exports.verifierElegibilite = asyncHandler(async (req, res) => {
       console.warn("Activity log failed (test_submitted):", e?.message || e);
     }
 
-      //  Gérer les noms en fonction du type
-      let blocNom;
+    //  Gérer les noms en fonction du type
+    let blocNom;
     if (personne.applicantType === "morale") {
-      blocNom = `<li><strong>Nom de l'entreprise :</strong> ${personne.nomEntreprise || "—"}</li>`;
+      blocNom = `<li><strong>Nom de l'entreprise :</strong> ${
+        personne.nomEntreprise || "—"
+      }</li>`;
     } else {
       blocNom = `
         <li><strong>Nom :</strong> ${personne.nom || "—"}</li>
@@ -151,20 +172,24 @@ exports.verifierElegibilite = asyncHandler(async (req, res) => {
       `;
     }
 
-      //  Affichage clair des chiffres d'affaires
-      let chiffresAffairesTxt = "";
-      const ca = created.chiffreAffaires || {};
-      if (ca.chiffreAffaire2022 || ca.chiffreAffaire2023 || ca.chiffreAffaire2024) {
-        chiffresAffairesTxt +=
-          `2022 : ${ca.chiffreAffaire2022 ?? "—"} DH\n` +
-          `2023 : ${ca.chiffreAffaire2023 ?? "—"} DH\n` +
-          `2024 : ${ca.chiffreAffaire2024 ?? "—"} DH`;
-      } else {
-        chiffresAffairesTxt = "Non renseigné";
-      }
+    //  Affichage clair des chiffres d'affaires
+    let chiffresAffairesTxt = "";
+    const ca = created.chiffreAffaires || {};
+    if (
+      ca.chiffreAffaire2022 ||
+      ca.chiffreAffaire2023 ||
+      ca.chiffreAffaire2024
+    ) {
+      chiffresAffairesTxt +=
+        `2022 : ${ca.chiffreAffaire2022 ?? "—"} DH\n` +
+        `2023 : ${ca.chiffreAffaire2023 ?? "—"} DH\n` +
+        `2024 : ${ca.chiffreAffaire2024 ?? "—"} DH`;
+    } else {
+      chiffresAffairesTxt = "Non renseigné";
+    }
 
-      const emailSubject = "Résultat de votre test d’éligibilité";
-const emailEligible = `
+    const emailSubject = "Résultat de votre test d’éligibilité";
+    const emailEligible = `
   <div style="background:#f5f5f5;padding:40px 0;font-family:'Segoe UI',Arial,sans-serif;">
     <div style="max-width:640px;margin:0 auto;background:#ffffff;border-radius:12px;
                 padding:40px;box-shadow:0 4px 20px rgba(0,0,0,0.06);
@@ -187,14 +212,31 @@ const emailEligible = `
       <div style="background:#fafafa;border-radius:8px;padding:18px;margin:16px 0;border:1px solid #e5e7eb;">
         <ul style="padding-left:18px;margin:0;list-style-type:none;">
           ${blocNom}
-          <li style="margin-bottom:6px;"><strong>Téléphone :</strong> ${personne.telephone || "—"}</li>
-          <li style="margin-bottom:6px;"><strong>Email :</strong> ${personne.email || "—"}</li>
-          <li style="margin-bottom:6px;"><strong>Ville :</strong> ${created.region || "—"}</li>
-          <li style="margin-bottom:6px;"><strong>Statut Juridique :</strong> ${created.statutJuridique || "—"}</li>
-          <li style="margin-bottom:6px;"><strong>Secteur d'activité :</strong> ${created.secteurTravail || "—"}</li>
-          <li style="margin-bottom:6px;"><strong>Date de création :</strong> ${created.anneeCreation || "—"}</li>
-          <li style="margin-bottom:6px;"><strong>Chiffres d'affaires :</strong><br>${chiffresAffairesTxt.replace(/\n/g, "<br>")}</li>
-          <li><strong>Montant d'investissement :</strong> ${created.montantInvestissement || "—"}</li>
+          <li style="margin-bottom:6px;"><strong>Téléphone :</strong> ${
+            data.telephone || personne.telephones?.[0] || "—"
+          }</li>
+          <li style="margin-bottom:6px;"><strong>Email :</strong> ${
+            personne.email || "—"
+          }</li>
+          <li style="margin-bottom:6px;"><strong>Ville :</strong> ${
+            created.region || "—"
+          }</li>
+          <li style="margin-bottom:6px;"><strong>Statut Juridique :</strong> ${
+            created.statutJuridique || "—"
+          }</li>
+          <li style="margin-bottom:6px;"><strong>Secteur d'activité :</strong> ${
+            created.secteurTravail || "—"
+          }</li>
+          <li style="margin-bottom:6px;"><strong>Date de création :</strong> ${
+            created.anneeCreation || "—"
+          }</li>
+          <li style="margin-bottom:6px;"><strong>Chiffres d'affaires :</strong><br>${chiffresAffairesTxt.replace(
+            /\n/g,
+            "<br>"
+          )}</li>
+          <li><strong>Montant d'investissement :</strong> ${
+            created.montantInvestissement || "—"
+          }</li>
         </ul>
       </div>
 
@@ -212,7 +254,9 @@ const emailEligible = `
       <p style="margin-top:24px;">Bien cordialement,</p>
 
       <div style="border-top:1px solid #e2e8f0;margin-top:32px;padding-top:24px;text-align:center;">
-        <img src="${process.env.FRONTEND_ORIGIN}/tamkeen.png" alt="Tamkeen Center"
+        <img src="${
+          process.env.FRONTEND_ORIGIN
+        }/tamkeen.png" alt="Tamkeen Center"
              width="120" style="display:block;margin:0 auto 14px;" />
         <p style="font-weight:600;font-size:16px;margin:0 0 4px;color:#2d3748;">L'équipe Tamkeen</p>
         <p style="font-size:13px;color:#6b7280;margin:0 0 12px;">Centre d'accompagnement & développement</p>
@@ -234,7 +278,7 @@ const emailEligible = `
   </div>
 `;
 
-const emailNonEligible = `
+    const emailNonEligible = `
   <div style="background:#f5f5f5;padding:40px 0;font-family:'Segoe UI',Arial,sans-serif;">
     <div style="max-width:640px;margin:0 auto;background:#ffffff;border-radius:12px;
                 padding:40px;box-shadow:0 4px 20px rgba(0,0,0,0.06);
@@ -256,14 +300,31 @@ const emailNonEligible = `
       <div style="background:#fafafa;border-radius:8px;padding:18px;margin:16px 0;border:1px solid #e5e7eb;">
         <ul style="padding-left:18px;margin:0;list-style-type:none;">
           ${blocNom}
-          <li style="margin-bottom:6px;"><strong>Téléphone :</strong> ${personne.telephone || "—"}</li>
-          <li style="margin-bottom:6px;"><strong>Email :</strong> ${personne.email || "—"}</li>
-          <li style="margin-bottom:6px;"><strong>Ville :</strong> ${created.region || "—"}</li>
-          <li style="margin-bottom:6px;"><strong>Statut Juridique :</strong> ${created.statutJuridique || "—"}</li>
-          <li style="margin-bottom:6px;"><strong>Secteur d'activité :</strong> ${created.secteurTravail || "—"}</li>
-          <li style="margin-bottom:6px;"><strong>Date de création :</strong> ${created.anneeCreation || "—"}</li>
-          <li style="margin-bottom:6px;"><strong>Chiffres d'affaires :</strong><br>${chiffresAffairesTxt.replace(/\n/g, "<br>")}</li>
-          <li><strong>Montant d'investissement :</strong> ${created.montantInvestissement || "—"}</li>
+          <li style="margin-bottom:6px;"><strong>Téléphone :</strong> ${
+            data.telephone || personne.telephones?.[0] || "—"
+          }</li>
+          <li style="margin-bottom:6px;"><strong>Email :</strong> ${
+            personne.email || "—"
+          }</li>
+          <li style="margin-bottom:6px;"><strong>Ville :</strong> ${
+            created.region || "—"
+          }</li>
+          <li style="margin-bottom:6px;"><strong>Statut Juridique :</strong> ${
+            created.statutJuridique || "—"
+          }</li>
+          <li style="margin-bottom:6px;"><strong>Secteur d'activité :</strong> ${
+            created.secteurTravail || "—"
+          }</li>
+          <li style="margin-bottom:6px;"><strong>Date de création :</strong> ${
+            created.anneeCreation || "—"
+          }</li>
+          <li style="margin-bottom:6px;"><strong>Chiffres d'affaires :</strong><br>${chiffresAffairesTxt.replace(
+            /\n/g,
+            "<br>"
+          )}</li>
+          <li><strong>Montant d'investissement :</strong> ${
+            created.montantInvestissement || "—"
+          }</li>
         </ul>
       </div>
 
@@ -276,7 +337,9 @@ const emailNonEligible = `
       <p style="margin-top:24px;">Bien cordialement,</p>
 
       <div style="border-top:1px solid #e2e8f0;margin-top:32px;padding-top:24px;text-align:center;">
-        <img src="${process.env.FRONTEND_ORIGIN}/tamkeen.png" alt="Tamkeen Center"
+        <img src="${
+          process.env.FRONTEND_ORIGIN
+        }/tamkeen.png" alt="Tamkeen Center"
              width="120" style="display:block;margin:0 auto 14px;" />
         <p style="font-weight:600;font-size:16px;margin:0 0 4px;color:#2d3748;">L'équipe Tamkeen</p>
         <p style="font-size:13px;color:#6b7280;margin:0 0 12px;">Centre d'accompagnement & développement</p>
@@ -298,23 +361,28 @@ const emailNonEligible = `
   </div>
 `;
 
-      //  Envoi
-      if (eligibleProgramNamesAndLinks.length > 0) {
-        await sendEmail(data.email, emailSubject, emailEligible);
-      } else {
-        await sendEmail(data.email, emailSubject, emailNonEligible);
-      }
+    //  Envoi
+    if (eligibleProgramNamesAndLinks.length > 0) {
+      await sendEmail(data.email, emailSubject, emailEligible);
+    } else {
+      await sendEmail(data.email, emailSubject, emailNonEligible);
+    }
 
-
-
-    return api.created(res, { programs: eligibleProgramNamesAndLinks , testId: created._id });
+    return api.created(res, {
+      programs: eligibleProgramNamesAndLinks,
+      testId: created._id,
+    });
   } catch (err) {
     //  Gestion spécifique des erreurs de clé dupliquée
     if (err.code === 11000) {
-      if (err.keyPattern && err.keyPattern.telephone) {
+      // Ancien index unique éventuel sur `telephone` (legacy)
+      if (
+        err.keyPattern &&
+        (err.keyPattern.telephone || err.keyPattern.telephones)
+      ) {
         return api.error(
           res,
-          "Ce numéro de téléphone est déjà utilisé par une autre personne physique ou entreprise avec des informations différentes.",
+          "Conflit de numéro de téléphone existant. Veuillez réessayer ou contacter le support.",
           400
         );
       }
@@ -416,7 +484,6 @@ exports.getAllTests = asyncHandler(async (req, res) => {
   });
 });
 
-
 exports.updateContactPreference = asyncHandler(async (req, res) => {
   try {
     const { id } = req.params;
@@ -436,4 +503,26 @@ exports.updateContactPreference = asyncHandler(async (req, res) => {
     console.error(err);
     res.status(500).json({ message: "Erreur serveur" });
   }
+});
+
+// Nouveau: récupérer les numéros existants par email (tous types confondus)
+exports.getPhonesByEmail = asyncHandler(async (req, res) => {
+  const { email } = req.query;
+  if (!email || typeof email !== "string") {
+    return api.error(res, "Paramètre email manquant", 400);
+  }
+  const personnes = await Personne.find({ email }).lean();
+  if (!personnes || personnes.length === 0) {
+    return api.ok(res, { found: false, telephones: [] });
+  }
+  const set = new Set();
+  for (const p of personnes) {
+    const arr = Array.isArray(p.telephones)
+      ? p.telephones
+      : p.telephone
+      ? [p.telephone]
+      : [];
+    for (const ph of arr) set.add(ph);
+  }
+  return api.ok(res, { found: true, telephones: Array.from(set) });
 });

@@ -1,8 +1,5 @@
 require("dotenv").config();
 
-// ⚠ Charger l’instrumentation AVANT tout le reste
-const Sentry = require("./instrument");
-
 const express = require("express");
 const cors = require("cors");
 const http = require("http");
@@ -14,6 +11,7 @@ const cookieParser = require("cookie-parser");
 const cookie = require("cookie");
 
 const app = express();
+
 // Middlewares
 app.use(
   cors({
@@ -67,13 +65,6 @@ app.use("/api/admin/news", newsRoutes);
 // Admin activity feed
 app.use("/api/admin/activity", activityRoutes);
 
-// Test Sentry
-app.get("/debug-sentry", (req, res) => {
-  throw new Error("Test Sentry error!");
-});
-
-// Middleware de capture des erreurs (nouvelle API)
-Sentry.setupExpressErrorHandler(app);
 
 const PORT = process.env.PORT || 5000;
 
@@ -82,7 +73,7 @@ const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
     origin: (process.env.FRONTEND_ORIGIN &&
-      process.env.FRONTEND_ORIGIN.split(",")) || ["http://localhost:5173"],
+      process.env.FRONTEND_ORIGIN.split(",")),
     credentials: true,
   },
   transports: ["websocket", "polling"],
@@ -131,4 +122,5 @@ async function startServer() {
     process.exit(1); // optionnel : quitter le processus en cas d’erreur critique
   }
 }
+
 startServer();
